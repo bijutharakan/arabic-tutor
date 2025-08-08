@@ -405,28 +405,44 @@ const Views = {
     app.innerHTML = `
       <div class="section">
         <h2>🎯 Quizzes</h2>
-        <div class="pill">Test your Arabic knowledge</div>
+        <div class="pill">Test your Arabic knowledge with improved scoring and feedback</div>
       </div>
       <div class="quiz-menu">
         <div class="quiz-card">
           <h3>🔊 Listening Quiz</h3>
           <p>Hear Arabic and choose the correct answer</p>
+          <div class="quiz-features">• Proper scoring • Wrong answer prevention • Detailed feedback</div>
           <button id="startListening" class="primary btn-touch">Start</button>
         </div>
         <div class="quiz-card">
           <h3>📝 Spelling Quiz</h3>
-          <p>Build Arabic words letter by letter</p>
+          <p>Build Arabic words letter by letter (Right-to-Left)</p>
+          <div class="quiz-features">• Fixed RTL display • Progressive hints • Score tracking</div>
           <button id="startSpelling" class="primary btn-touch">Start</button>
         </div>
         <div class="quiz-card">
           <h3>🔄 Translation Quiz</h3>
           <p>Translate between Arabic and English</p>
+          <div class="quiz-features">• Bidirectional • Audio feedback • Detailed results</div>
           <button id="startTranslation" class="primary btn-touch">Start</button>
         </div>
         <div class="quiz-card">
           <h3>✍️ Forms Quiz</h3>
           <p>Identify letter forms in different positions</p>
+          <div class="quiz-features">• Connection info • Visual guides • Explanations</div>
           <button id="startForms" class="primary btn-touch">Start</button>
+        </div>
+        <div class="quiz-card">
+          <h3>🎵 Diacritics Quiz</h3>
+          <p>Test your knowledge of Arabic vowel marks</p>
+          <div class="quiz-features">• Harakat practice • Sound differences • NEW!</div>
+          <button id="startDiacritics" class="primary btn-touch">Start</button>
+        </div>
+        <div class="quiz-card">
+          <h3>⚡ Speed Quiz</h3>
+          <p>Quick-fire Arabic letter and word recognition</p>
+          <div class="quiz-features">• Timed challenges • Multiple difficulty levels • NEW!</div>
+          <button id="startSpeedQuiz" class="primary btn-touch">Start</button>
         </div>
       </div>
       <div id="quizArea"></div>
@@ -436,6 +452,8 @@ const Views = {
     document.getElementById('startSpelling')?.addEventListener('click', startSpellingQuiz);
     document.getElementById('startTranslation')?.addEventListener('click', startTranslationQuiz);
     document.getElementById('startForms')?.addEventListener('click', startFormsQuiz);
+    document.getElementById('startDiacritics')?.addEventListener('click', startDiacriticsQuiz);
+    document.getElementById('startSpeedQuiz')?.addEventListener('click', startSpeedQuiz);
   },
 
   games() {
@@ -606,30 +624,50 @@ function startListeningQuiz() {
   const area = document.getElementById('quizArea');
   const allWords = WORD_CATEGORIES.flatMap(c => c.words);
   let score = 0;
+  let wrongAnswers = 0;
   let round = 0;
   const maxRounds = 10;
   
   function nextRound() {
     if (round >= maxRounds) {
+      const percentage = Math.round((score / maxRounds) * 100);
       area.innerHTML = `
         <div class="quiz-complete">
-          <h3>Quiz Complete!</h3>
-          <div class="score">Score: ${score}/${maxRounds}</div>
-          <button class="primary btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          <h3>Listening Quiz Complete!</h3>
+          <div class="score-details">
+            <div class="score-main">Score: ${score}/${maxRounds} (${percentage}%)</div>
+            <div class="score-breakdown">
+              ✅ Correct: ${score} | ❌ Wrong: ${wrongAnswers}
+            </div>
+          </div>
+          ${percentage >= 80 ? '<div class="achievement">🏆 Excellent work!</div>' : 
+            percentage >= 60 ? '<div class="achievement">👍 Good job!</div>' : 
+            '<div class="encouragement">💪 Keep practicing!</div>'}
+          <div class="quiz-actions">
+            <button class="primary btn-touch" onclick="startListeningQuiz()">Try Again</button>
+            <button class="btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          </div>
         </div>
       `;
-      playSound('correct');
+      playSound(percentage >= 80 ? 'correct' : 'wrong');
       return;
     }
     
     round++;
     const correctWord = allWords[Math.floor(Math.random() * allWords.length)];
     const options = shuffle([correctWord, ...pickMany(allWords.filter(w => w !== correctWord), 3)]);
+    let answered = false;
     
     area.innerHTML = `
       <div class="quiz-round">
-        <h3>Round ${round}/${maxRounds}</h3>
-        <button class="hear-btn btn-touch">🔊 Listen Again</button>
+        <div class="quiz-header">
+          <h3>Round ${round}/${maxRounds}</h3>
+          <div class="score-display">Score: ${score}/${round - 1}</div>
+        </div>
+        <div class="audio-section">
+          <button class="hear-btn btn-touch">🔊 Listen Again</button>
+          <div class="instructions">Choose the word you hear:</div>
+        </div>
         <div class="quiz-options">
           ${options.map(w => `
             <button class="option-btn btn-touch" data-word="${w.ar}">
@@ -646,14 +684,27 @@ function startListeningQuiz() {
     
     area.querySelectorAll('.option-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (answered) return; // Prevent multiple answers
+        
+        answered = true;
         if (btn.dataset.word === correctWord.ar) {
           btn.classList.add('correct');
           score++;
           playSound('correct');
-          setTimeout(nextRound, 1000);
+          // Show correct feedback
+          area.innerHTML += `<div class="feedback correct-feedback">✅ Correct! "${correctWord.en}" is ${correctWord.ar}</div>`;
+          setTimeout(nextRound, 1500);
         } else {
           btn.classList.add('wrong');
+          wrongAnswers++;
           playSound('wrong');
+          // Show the correct answer
+          const correctBtn = area.querySelector(`[data-word="${correctWord.ar}"]`);
+          correctBtn.classList.add('correct-highlight');
+          area.innerHTML += `<div class="feedback wrong-feedback">❌ Wrong! The correct answer was "${correctWord.en}" (${correctWord.ar})</div>`;
+          // Disable all buttons
+          area.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+          setTimeout(nextRound, 2500);
         }
       });
     });
@@ -667,91 +718,176 @@ function startListeningQuiz() {
 function startSpellingQuiz() {
   const area = document.getElementById('quizArea');
   const allWords = WORD_CATEGORIES.flatMap(c => c.words);
-  const word = allWords[Math.floor(Math.random() * allWords.length)];
-  const letters = word.ar.split('');
-  let currentIndex = 0;
+  let score = 0;
+  let totalWords = 0;
   
-  area.innerHTML = `
-    <div class="spelling-quiz">
-      <h3>Spell the word for:</h3>
-      <div class="word-prompt">
-        <div class="word-pic">${word.pic}</div>
-        <div class="word-en">${word.en}</div>
+  function startNewWord() {
+    const word = allWords[Math.floor(Math.random() * allWords.length)];
+    const letters = word.ar.split('');
+    let currentIndex = 0;
+    let mistakes = 0;
+    
+    area.innerHTML = `
+      <div class="spelling-quiz">
+        <div class="quiz-header">
+          <h3>Spell the word for:</h3>
+          <div class="quiz-stats">Words: ${totalWords} | Score: ${score}</div>
+        </div>
+        <div class="word-prompt">
+          <div class="word-pic">${word.pic}</div>
+          <div class="word-en">${word.en}</div>
+          <button class="hint-btn btn-touch" onclick="speakAr('${word.ar}')">🔊 Hear Word</button>
+        </div>
+        <div class="spelling-direction-note">Build the Arabic word from right to left ←</div>
+        <div class="spelling-progress" id="progress"></div>
+        <div class="letter-options" id="letterOptions"></div>
+        <div class="spelling-actions">
+          <button class="skip-btn btn-touch" onclick="startSpellingQuiz()">Skip Word</button>
+        </div>
       </div>
-      <div class="spelling-progress" id="progress"></div>
-      <div class="letter-options" id="letterOptions"></div>
-    </div>
-  `;
-  
-  function updateProgress() {
-    const progress = document.getElementById('progress');
-    progress.innerHTML = letters.map((l, i) => {
-      if (i < currentIndex) return `<span class="done">${l}</span>`;
-      if (i === currentIndex) return `<span class="current">?</span>`;
-      return `<span class="pending">_</span>`;
-    }).join('');
-  }
-  
-  function showOptions() {
-    const optionsDiv = document.getElementById('letterOptions');
-    const correctLetter = letters[currentIndex];
-    const allLetters = LETTERS.map(l => l.ar);
-    const options = shuffle([correctLetter, ...pickMany(allLetters.filter(l => l !== correctLetter), 5)]);
+    `;
     
-    optionsDiv.innerHTML = options.map(letter => 
-      `<button class="letter-option btn-touch">${letter}</button>`
-    ).join('');
-    
-    optionsDiv.querySelectorAll('.letter-option').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (btn.textContent === correctLetter) {
-          btn.classList.add('correct');
-          currentIndex++;
-          playSound('correct');
-          
-          if (currentIndex >= letters.length) {
-            setTimeout(() => {
-              area.innerHTML = `
-                <div class="quiz-complete">
-                  <h3>Perfect! You spelled "${word.en}"</h3>
-                  <div class="arabic-result">${word.ar}</div>
-                  <button class="primary btn-touch" onclick="speakAr('${word.ar}')">🔊 Listen</button>
-                  <button class="primary btn-touch" onclick="startSpellingQuiz()">Next Word</button>
-                </div>
-              `;
-            }, 500);
-          } else {
-            setTimeout(() => {
-              updateProgress();
-              showOptions();
-            }, 500);
-          }
+    function updateProgress() {
+      const progress = document.getElementById('progress');
+      // Build Arabic text from right to left - reverse the display order
+      const displayLetters = [];
+      for (let i = letters.length - 1; i >= 0; i--) {
+        if (i >= letters.length - currentIndex) {
+          displayLetters.push(`<span class="done">${letters[i]}</span>`);
+        } else if (i === letters.length - currentIndex - 1) {
+          displayLetters.push(`<span class="current">?</span>`);
         } else {
-          btn.classList.add('wrong');
-          playSound('wrong');
+          displayLetters.push(`<span class="pending">_</span>`);
         }
+      }
+      progress.innerHTML = `<div class="rtl-progress">${displayLetters.join('')}</div>`;
+      
+      // Add progress indicator
+      const progressPercent = (currentIndex / letters.length) * 100;
+      progress.innerHTML += `
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${progressPercent}%"></div>
+        </div>
+        <div class="progress-text">Letter ${currentIndex + 1} of ${letters.length}</div>
+      `;
+    }
+    
+    function showOptions() {
+      const optionsDiv = document.getElementById('letterOptions');
+      const correctLetter = letters[currentIndex];
+      const allLetters = LETTERS.map(l => l.ar);
+      const options = shuffle([correctLetter, ...pickMany(allLetters.filter(l => l !== correctLetter), 5)]);
+      let answered = false;
+      
+      optionsDiv.innerHTML = `
+        <div class="letter-instruction">Choose the ${currentIndex === 0 ? 'first (rightmost)' : 
+          currentIndex === letters.length - 1 ? 'last (leftmost)' : 'next'} letter:</div>
+        <div class="letter-grid">
+          ${options.map(letter => 
+            `<button class="letter-option btn-touch">${letter}</button>`
+          ).join('')}
+        </div>
+      `;
+      
+      optionsDiv.querySelectorAll('.letter-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return; // Prevent multiple clicks
+          answered = true;
+          
+          if (btn.textContent === correctLetter) {
+            btn.classList.add('correct');
+            currentIndex++;
+            playSound('correct');
+            
+            if (currentIndex >= letters.length) {
+              totalWords++;
+              const wordScore = Math.max(1, 3 - mistakes); // 3 points if perfect, minimum 1
+              score += wordScore;
+              
+              setTimeout(() => {
+                area.innerHTML = `
+                  <div class="word-complete">
+                    <h3>Excellent! You spelled "${word.en}"</h3>
+                    <div class="arabic-result-display">
+                      <div class="arabic-word">${word.ar}</div>
+                      <div class="word-meaning">(${word.en})</div>
+                    </div>
+                    <div class="word-score">+${wordScore} points ${mistakes === 0 ? '🏆 Perfect!' : ''}</div>
+                    <div class="quiz-actions">
+                      <button class="primary btn-touch" onclick="speakAr('${word.ar}')">🔊 Listen</button>
+                      <button class="primary btn-touch" onclick="startSpellingQuiz().startNewWord()">Next Word</button>
+                      <button class="btn-touch" onclick="route('quizzes')">Finish Quiz</button>
+                    </div>
+                  </div>
+                `;
+              }, 800);
+            } else {
+              setTimeout(() => {
+                updateProgress();
+                showOptions();
+              }, 600);
+            }
+          } else {
+            btn.classList.add('wrong');
+            mistakes++;
+            playSound('wrong');
+            
+            // Show feedback and correct answer
+            const correctBtn = optionsDiv.querySelector(`button:nth-child(${options.indexOf(correctLetter) + 1})`);
+            setTimeout(() => {
+              if (correctBtn) correctBtn.classList.add('correct-highlight');
+              // Disable all buttons briefly
+              optionsDiv.querySelectorAll('.letter-option').forEach(b => b.disabled = true);
+              
+              setTimeout(() => {
+                answered = false;
+                optionsDiv.querySelectorAll('.letter-option').forEach(b => {
+                  b.disabled = false;
+                  b.classList.remove('wrong', 'correct-highlight');
+                });
+              }, 1500);
+            }, 300);
+          }
+        });
       });
-    });
+    }
+    
+    updateProgress();
+    showOptions();
   }
   
-  updateProgress();
-  showOptions();
+  // Add this property to make startNewWord accessible
+  startSpellingQuiz.startNewWord = startNewWord;
+  startNewWord();
 }
 
 function startTranslationQuiz() {
   const area = document.getElementById('quizArea');
   const allWords = WORD_CATEGORIES.flatMap(c => c.words);
   let score = 0;
+  let wrongAnswers = 0;
   let round = 0;
   const maxRounds = 10;
   
   function nextRound() {
     if (round >= maxRounds) {
+      const percentage = Math.round((score / maxRounds) * 100);
       area.innerHTML = `
         <div class="quiz-complete">
           <h3>Translation Quiz Complete!</h3>
-          <div class="score">Score: ${score}/${maxRounds}</div>
-          <button class="primary btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          <div class="score-details">
+            <div class="score-main">Score: ${score}/${maxRounds} (${percentage}%)</div>
+            <div class="score-breakdown">
+              ✅ Correct: ${score} | ❌ Wrong: ${wrongAnswers}
+            </div>
+          </div>
+          ${percentage >= 80 ? '<div class="achievement">🏆 Excellent translation skills!</div>' : 
+            percentage >= 60 ? '<div class="achievement">👍 Good work on translations!</div>' : 
+            '<div class="encouragement">💪 Keep studying vocabulary!</div>'}
+          <div class="quiz-actions">
+            <button class="primary btn-touch" onclick="startTranslationQuiz()">Try Again</button>
+            <button class="btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          </div>
         </div>
       `;
       return;
@@ -761,22 +897,29 @@ function startTranslationQuiz() {
     const isArabicToEnglish = Math.random() > 0.5;
     const correctWord = allWords[Math.floor(Math.random() * allWords.length)];
     const options = shuffle([correctWord, ...pickMany(allWords.filter(w => w !== correctWord), 3)]);
+    let answered = false;
     
     area.innerHTML = `
       <div class="translation-quiz">
-        <h3>Round ${round}/${maxRounds}</h3>
+        <div class="quiz-header">
+          <h3>Round ${round}/${maxRounds}</h3>
+          <div class="score-display">Score: ${score}/${round - 1}</div>
+        </div>
         <div class="translate-prompt">
+          <div class="translation-type">${isArabicToEnglish ? 'Arabic → English' : 'English → Arabic'}</div>
           ${isArabicToEnglish ? 
-            `<div class="arabic-text">${correctWord.ar}</div>` :
+            `<div class="arabic-text">${correctWord.ar}</div>
+             <button class="hear-translation btn-touch" onclick="speakAr('${correctWord.ar}')">🔊</button>` :
             `<div class="english-text">${correctWord.pic} ${correctWord.en}</div>`
           }
         </div>
-        <p>Choose the translation:</p>
+        <p class="instruction">Choose the ${isArabicToEnglish ? 'English' : 'Arabic'} translation:</p>
         <div class="translation-options">
           ${options.map(w => `
             <button class="trans-option btn-touch" data-word="${w.ar}">
               ${isArabicToEnglish ? 
-                `${w.pic} ${w.en}` :
+                `<span class="option-icon">${w.pic}</span>
+                 <span class="option-text">${w.en}</span>` :
                 `<span class="arabic-option">${w.ar}</span>`
               }
             </button>
@@ -787,14 +930,47 @@ function startTranslationQuiz() {
     
     area.querySelectorAll('.trans-option').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (answered) return; // Prevent multiple answers
+        
+        answered = true;
         if (btn.dataset.word === correctWord.ar) {
           btn.classList.add('correct');
           score++;
           playSound('correct');
-          setTimeout(nextRound, 1000);
+          
+          // Show success feedback
+          const feedback = document.createElement('div');
+          feedback.className = 'feedback correct-feedback';
+          feedback.innerHTML = `✅ Correct! ${correctWord.ar} = "${correctWord.en}"`;
+          area.appendChild(feedback);
+          
+          if (isArabicToEnglish) {
+            setTimeout(() => speakAr(correctWord.ar), 500);
+          }
+          
+          setTimeout(nextRound, 1800);
         } else {
           btn.classList.add('wrong');
+          wrongAnswers++;
           playSound('wrong');
+          
+          // Show correct answer
+          const correctBtn = area.querySelector(`[data-word="${correctWord.ar}"]`);
+          correctBtn.classList.add('correct-highlight');
+          
+          // Show error feedback
+          const feedback = document.createElement('div');
+          feedback.className = 'feedback wrong-feedback';
+          feedback.innerHTML = `❌ Wrong! The correct answer is: ${correctWord.ar} = "${correctWord.en}"`;
+          area.appendChild(feedback);
+          
+          // Disable all options
+          area.querySelectorAll('.trans-option').forEach(b => b.disabled = true);
+          
+          // Speak the correct answer
+          setTimeout(() => speakAr(correctWord.ar), 500);
+          
+          setTimeout(nextRound, 2500);
         }
       });
     });
@@ -806,16 +982,30 @@ function startTranslationQuiz() {
 function startFormsQuiz() {
   const area = document.getElementById('quizArea');
   let score = 0;
+  let wrongAnswers = 0;
   let round = 0;
   const maxRounds = 10;
   
   function nextRound() {
     if (round >= maxRounds) {
+      const percentage = Math.round((score / maxRounds) * 100);
       area.innerHTML = `
         <div class="quiz-complete">
-          <h3>Forms Quiz Complete!</h3>
-          <div class="score">Score: ${score}/${maxRounds}</div>
-          <button class="primary btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          <h3>Letter Forms Quiz Complete!</h3>
+          <div class="score-details">
+            <div class="score-main">Score: ${score}/${maxRounds} (${percentage}%)</div>
+            <div class="score-breakdown">
+              ✅ Correct: ${score} | ❌ Wrong: ${wrongAnswers}
+            </div>
+          </div>
+          ${percentage >= 80 ? '<div class="achievement">🏆 Master of Arabic letter forms!</div>' : 
+            percentage >= 60 ? '<div class="achievement">👍 Good knowledge of letter forms!</div>' : 
+            '<div class="encouragement">💪 Study the letter forms more!</div>'}
+          <div class="quiz-actions">
+            <button class="primary btn-touch" onclick="startFormsQuiz()">Try Again</button>
+            <button class="btn-touch" onclick="route('letterforms')">Study Letter Forms</button>
+            <button class="btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          </div>
         </div>
       `;
       return;
@@ -825,33 +1015,97 @@ function startFormsQuiz() {
     const letter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
     const positions = ['isolated', 'initial', 'medial', 'final'];
     const correctPosition = positions[Math.floor(Math.random() * positions.length)];
+    let answered = false;
+    
+    // Show connection information
+    const connectionInfo = letter.canConnect.before && letter.canConnect.after ? 'Connects both ways' :
+                          letter.canConnect.before ? 'Only connects to previous letter' :
+                          letter.canConnect.after ? 'Only connects to next letter' : 
+                          'Does not connect to other letters';
     
     area.innerHTML = `
       <div class="forms-quiz">
-        <h3>Round ${round}/${maxRounds}</h3>
-        <p>Which position is this letter in?</p>
-        <div class="form-display">${letter.forms[correctPosition]}</div>
-        <p class="letter-name">${letter.name}</p>
+        <div class="quiz-header">
+          <h3>Round ${round}/${maxRounds}</h3>
+          <div class="score-display">Score: ${score}/${round - 1}</div>
+        </div>
+        <div class="forms-question">
+          <p class="question">Which position is this letter form in?</p>
+          <div class="form-display-container">
+            <div class="form-display">${letter.forms[correctPosition]}</div>
+            <div class="letter-info">
+              <div class="letter-name">Letter: ${letter.name} (${letter.ar})</div>
+              <div class="connection-info">${connectionInfo}</div>
+            </div>
+          </div>
+          <div class="position-explanation">
+            <div class="pos-guide">
+              <span>📍 Isolated</span> • <span>🔗 Initial</span> • <span>🔗 Medial</span> • <span>🏁 Final</span>
+            </div>
+          </div>
+        </div>
         <div class="position-options">
-          ${positions.map(pos => `
-            <button class="pos-option btn-touch" data-position="${pos}">
-              ${pos.charAt(0).toUpperCase() + pos.slice(1)}
-            </button>
-          `).join('')}
+          ${positions.map(pos => {
+            const icons = { isolated: '📍', initial: '🔗', medial: '🔗', final: '🏁' };
+            const examples = {
+              isolated: letter.forms.isolated,
+              initial: letter.forms.initial, 
+              medial: letter.forms.medial,
+              final: letter.forms.final
+            };
+            return `
+              <button class="pos-option btn-touch" data-position="${pos}">
+                <div class="pos-label">${icons[pos]} ${pos.charAt(0).toUpperCase() + pos.slice(1)}</div>
+                <div class="pos-example">${examples[pos]}</div>
+              </button>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
     
     area.querySelectorAll('.pos-option').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (answered) return; // Prevent multiple answers
+        
+        answered = true;
         if (btn.dataset.position === correctPosition) {
           btn.classList.add('correct');
           score++;
           playSound('correct');
-          setTimeout(nextRound, 1000);
+          
+          // Show success feedback
+          const feedback = document.createElement('div');
+          feedback.className = 'feedback correct-feedback';
+          feedback.innerHTML = `✅ Correct! This is the ${correctPosition} form of ${letter.name}`;
+          area.appendChild(feedback);
+          
+          setTimeout(nextRound, 1500);
         } else {
           btn.classList.add('wrong');
+          wrongAnswers++;
           playSound('wrong');
+          
+          // Show correct answer
+          const correctBtn = area.querySelector(`[data-position="${correctPosition}"]`);
+          correctBtn.classList.add('correct-highlight');
+          
+          // Show error feedback with explanation
+          const feedback = document.createElement('div');
+          feedback.className = 'feedback wrong-feedback';
+          const explanations = {
+            isolated: 'stands alone, not connected to other letters',
+            initial: 'starts a word, connects only to the right',
+            medial: 'in the middle, connects on both sides', 
+            final: 'ends a word, connects only to the left'
+          };
+          feedback.innerHTML = `❌ Wrong! This is the <strong>${correctPosition}</strong> form - it ${explanations[correctPosition]}.`;
+          area.appendChild(feedback);
+          
+          // Disable all options
+          area.querySelectorAll('.pos-option').forEach(b => b.disabled = true);
+          
+          setTimeout(nextRound, 2500);
         }
       });
     });
@@ -1386,10 +1640,298 @@ function pickMany(list, count) {
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
+// New Quiz Functions
+function startDiacriticsQuiz() {
+  const area = document.getElementById('quizArea');
+  let score = 0;
+  let wrongAnswers = 0;
+  let round = 0;
+  const maxRounds = 8;
+  
+  function nextRound() {
+    if (round >= maxRounds) {
+      const percentage = Math.round((score / maxRounds) * 100);
+      area.innerHTML = `
+        <div class="quiz-complete">
+          <h3>Diacritics Quiz Complete!</h3>
+          <div class="score-details">
+            <div class="score-main">Score: ${score}/${maxRounds} (${percentage}%)</div>
+            <div class="score-breakdown">
+              ✅ Correct: ${score} | ❌ Wrong: ${wrongAnswers}
+            </div>
+          </div>
+          ${percentage >= 80 ? '<div class="achievement">🏆 Harakat master!</div>' : 
+            percentage >= 60 ? '<div class="achievement">👍 Good diacritics knowledge!</div>' : 
+            '<div class="encouragement">💪 Practice more with harakat!</div>'}
+          <div class="quiz-actions">
+            <button class="primary btn-touch" onclick="startDiacriticsQuiz()">Try Again</button>
+            <button class="btn-touch" onclick="route('diacritics')">Study Diacritics</button>
+            <button class="btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    round++;
+    const diacritic = DIACRITICS[Math.floor(Math.random() * DIACRITICS.length)];
+    const options = shuffle([diacritic, ...pickMany(DIACRITICS.filter(d => d !== diacritic), 3)]);
+    let answered = false;
+    
+    area.innerHTML = `
+      <div class="diacritics-quiz">
+        <div class="quiz-header">
+          <h3>Round ${round}/${maxRounds}</h3>
+          <div class="score-display">Score: ${score}/${round - 1}</div>
+        </div>
+        <div class="diacritic-question">
+          <p class="question">What sound does this diacritic make?</p>
+          <div class="diacritic-display">
+            <span class="base-letter">د</span><span class="test-diacritic">${diacritic.ar}</span>
+          </div>
+          <button class="hear-diacritic btn-touch" onclick="speakAr('د${diacritic.ar}', 0.6)">🔊 Hear Sound</button>
+        </div>
+        <div class="diacritic-options">
+          ${options.map(d => `
+            <button class="diac-option btn-touch" data-sound="${d.sound}" data-name="${d.name}">
+              <div class="option-symbol">د${d.ar}</div>
+              <div class="option-name">${d.name}</div>
+              <div class="option-sound">"${d.sound}"</div>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    
+    area.querySelectorAll('.diac-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (answered) return;
+        
+        answered = true;
+        if (btn.dataset.sound === diacritic.sound) {
+          btn.classList.add('correct');
+          score++;
+          playSound('correct');
+          
+          const feedback = document.createElement('div');
+          feedback.className = 'feedback correct-feedback';
+          feedback.innerHTML = `✅ Correct! ${diacritic.name} makes the "${diacritic.sound}" sound`;
+          area.appendChild(feedback);
+          
+          setTimeout(() => speakAr(`د${diacritic.ar}`, 0.6), 500);
+          setTimeout(nextRound, 1800);
+        } else {
+          btn.classList.add('wrong');
+          wrongAnswers++;
+          playSound('wrong');
+          
+          const correctBtn = area.querySelector(`[data-sound="${diacritic.sound}"]`);
+          correctBtn.classList.add('correct-highlight');
+          
+          const feedback = document.createElement('div');
+          feedback.className = 'feedback wrong-feedback';
+          feedback.innerHTML = `❌ Wrong! ${diacritic.name} makes the "${diacritic.sound}" sound, not "${btn.dataset.sound}"`;
+          area.appendChild(feedback);
+          
+          area.querySelectorAll('.diac-option').forEach(b => b.disabled = true);
+          setTimeout(() => speakAr(`د${diacritic.ar}`, 0.6), 500);
+          setTimeout(nextRound, 2500);
+        }
+      });
+    });
+    
+    // Auto-play the sound after a short delay
+    setTimeout(() => speakAr(`د${diacritic.ar}`, 0.6), 800);
+  }
+  
+  nextRound();
+}
+
+function startSpeedQuiz() {
+  const area = document.getElementById('quizArea');
+  
+  area.innerHTML = `
+    <div class="speed-quiz-menu">
+      <h3>Choose Your Speed Challenge</h3>
+      <div class="difficulty-options">
+        <div class="difficulty-card">
+          <h4>👍 Easy Mode</h4>
+          <p>Letter Recognition • 90 seconds • 4 choices</p>
+          <button class="start-difficulty btn-touch" data-mode="easy">Start Easy</button>
+        </div>
+        <div class="difficulty-card">
+          <h4>💪 Medium Mode</h4>
+          <p>Word Recognition • 60 seconds • 6 choices</p>
+          <button class="start-difficulty btn-touch" data-mode="medium">Start Medium</button>
+        </div>
+        <div class="difficulty-card">
+          <h4>🔥 Hard Mode</h4>
+          <p>Mixed Challenge • 45 seconds • 8 choices</p>
+          <button class="start-difficulty btn-touch" data-mode="hard">Start Hard</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  area.querySelectorAll('.start-difficulty').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      startSpeedMode(mode);
+    });
+  });
+}
+
+function startSpeedMode(difficulty) {
+  const area = document.getElementById('quizArea');
+  const configs = {
+    easy: { time: 90, optionCount: 4, type: 'letters' },
+    medium: { time: 60, optionCount: 6, type: 'words' },
+    hard: { time: 45, optionCount: 8, type: 'mixed' }
+  };
+  
+  const config = configs[difficulty];
+  let score = 0;
+  let timeLeft = config.time;
+  let gameActive = true;
+  let combo = 0;
+  let maxCombo = 0;
+  
+  function showChallenge() {
+    if (!gameActive) return;
+    
+    let target, options, isWordChallenge = false;
+    
+    if (config.type === 'letters' || (config.type === 'mixed' && Math.random() > 0.5)) {
+      // Letter challenge
+      target = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+      options = shuffle([target, ...pickMany(LETTERS.filter(l => l !== target), config.optionCount - 1)]);
+    } else {
+      // Word challenge
+      const allWords = WORD_CATEGORIES.flatMap(c => c.words);
+      target = allWords[Math.floor(Math.random() * allWords.length)];
+      options = shuffle([target, ...pickMany(allWords.filter(w => w !== target), config.optionCount - 1)]);
+      isWordChallenge = true;
+    }
+    
+    area.innerHTML = `
+      <div class="speed-challenge">
+        <div class="game-header">
+          <div class="stats-row">
+            <div>Score: <span id="score">${score}</span></div>
+            <div>Time: <span id="time">${timeLeft}</span>s</div>
+            <div>Combo: <span id="combo">${combo}</span>x</div>
+          </div>
+          <div class="difficulty-badge">${difficulty.toUpperCase()} MODE</div>
+        </div>
+        <div class="challenge-content">
+          ${isWordChallenge ? `
+            <h3>Find: ${target.pic} "${target.en}"</h3>
+            <div class="speed-options word-options">
+              ${options.map(w => `
+                <button class="speed-option btn-touch" data-correct="${w === target}">
+                  ${w.ar}
+                </button>
+              `).join('')}
+            </div>
+          ` : `
+            <h3>Find the letter:</h3>
+            <div class="target-display">
+              <div class="target-letter">${target.ar}</div>
+              <div class="target-name">${target.name}</div>
+            </div>
+            <div class="speed-options letter-options">
+              ${options.map(l => `
+                <button class="speed-option btn-touch" data-correct="${l === target}">
+                  ${l.ar}
+                </button>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+    
+    let answered = false;
+    area.querySelectorAll('.speed-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        
+        if (btn.dataset.correct === 'true') {
+          combo++;
+          maxCombo = Math.max(maxCombo, combo);
+          const points = isWordChallenge ? 3 : 2;
+          const comboBonus = Math.floor(combo / 5);
+          score += points + comboBonus;
+          
+          btn.classList.add('correct');
+          playSound('correct');
+          
+          setTimeout(showChallenge, 300);
+        } else {
+          combo = 0;
+          btn.classList.add('wrong');
+          playSound('wrong');
+          
+          setTimeout(showChallenge, 800);
+        }
+      });
+    });
+  }
+  
+  showChallenge();
+  speakAr("Start!");
+  
+  const timer = setInterval(() => {
+    timeLeft--;
+    if (document.getElementById('time')) {
+      document.getElementById('time').textContent = timeLeft;
+    }
+    if (document.getElementById('score')) {
+      document.getElementById('score').textContent = score;
+    }
+    if (document.getElementById('combo')) {
+      document.getElementById('combo').textContent = combo;
+    }
+    
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      gameActive = false;
+      
+      const rating = score >= 100 ? 'Amazing!' : 
+                    score >= 60 ? 'Great job!' : 
+                    score >= 30 ? 'Good work!' : 'Keep practicing!';
+                    
+      area.innerHTML = `
+        <div class="game-complete">
+          <h3>Speed Quiz Complete!</h3>
+          <div class="final-stats">
+            <div class="main-score">Final Score: ${score}</div>
+            <div class="performance-rating">${rating}</div>
+            <div class="detailed-stats">
+              <div>Difficulty: ${difficulty.toUpperCase()}</div>
+              <div>Max Combo: ${maxCombo}x</div>
+              <div>Time: ${config.time} seconds</div>
+            </div>
+          </div>
+          <div class="quiz-actions">
+            <button class="primary btn-touch" onclick="startSpeedQuiz()">Try Different Mode</button>
+            <button class="btn-touch" onclick="startSpeedMode('${difficulty}')">Same Mode Again</button>
+            <button class="btn-touch" onclick="route('quizzes')">Back to Quizzes</button>
+          </div>
+        </div>
+      `;
+    }
+  }, 1000);
+}
+
 // Make functions globally available for onclick handlers
 window.route = route;
 window.speakAr = speakAr;
 window.startSpellingQuiz = startSpellingQuiz;
+window.startDiacriticsQuiz = startDiacriticsQuiz;
+window.startSpeedQuiz = startSpeedQuiz;
+window.startSpeedMode = startSpeedMode;
 window.startMemoryGame = startMemoryGame;
 window.startWordHunter = startWordHunter;
 window.startSpeedChallenge = startSpeedChallenge;
