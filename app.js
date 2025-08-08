@@ -164,6 +164,12 @@ function route(view){
 }
 
 const Views = {
+  beginners() {
+    // Render the beginners hub
+    app.innerHTML = beginners.renderBeginnersHub();
+    beginners.init();
+  },
+  
   letters() {
     const showHints = document.getElementById('hintsToggle')?.checked;
     
