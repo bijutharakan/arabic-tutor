@@ -477,7 +477,7 @@ const Views = {
         <div class="quiz-card">
           <h3>📝 Spelling Quiz</h3>
           <p>Build Arabic words letter by letter (Right-to-Left)</p>
-          <div class="quiz-features">• Fixed RTL display • Progressive hints • Score tracking</div>
+          <div class="quiz-features">• Progressive hints • Score tracking • Instant feedback</div>
           <button id="startSpelling" class="primary btn-touch">Start</button>
         </div>
         <div class="quiz-card">

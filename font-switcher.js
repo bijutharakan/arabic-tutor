@@ -387,23 +387,25 @@ document.addEventListener('DOMContentLoaded', () => {
     controls.className = 'font-size-controls';
     controls.style.cssText = `
       position: fixed;
-      top: 10px;
-      right: 230px;
+      top: 15px;
+      right: 280px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.98);
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      padding: 5px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      padding: 6px 8px;
       display: flex;
-      gap: 3px;
+      gap: 4px;
       align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.8);
     `;
     
     controls.innerHTML = `
-      <span style="font-size: 12px; color: #666; margin-right: 5px;">Size:</span>
-      <button class="size-btn" onclick="adjustFontSize(-0.1)" style="padding: 3px 8px; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; background: white; font-size: 12px;">A-</button>
-      <button class="size-btn" onclick="adjustFontSize(0.1)" style="padding: 3px 8px; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; background: white; font-size: 12px;">A+</button>
-      <button class="size-btn" onclick="resetFontSize()" style="padding: 3px 8px; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; background: white; font-size: 11px;">↺</button>
+      <span style="font-size: 13px; color: #4a5568; margin-right: 6px; font-weight: 600;">Size:</span>
+      <button class="size-btn" onclick="adjustFontSize(-0.1)" style="padding: 4px 10px; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 6px; cursor: pointer; background: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 600; transition: all 0.2s;">A-</button>
+      <button class="size-btn" onclick="adjustFontSize(0.1)" style="padding: 4px 10px; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 6px; cursor: pointer; background: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 600; transition: all 0.2s;">A+</button>
+      <button class="size-btn" onclick="resetFontSize()" style="padding: 4px 10px; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 6px; cursor: pointer; background: rgba(255, 255, 255, 0.9); font-size: 12px; transition: all 0.2s;">↺</button>
     `;
     
     document.body.appendChild(controls);
