@@ -1925,6 +1925,193 @@ function startSpeedMode(difficulty) {
   }, 1000);
 }
 
+// Function to show phrase category
+function showPhraseCategory(categoryKey) {
+  const content = document.getElementById('phrasesContent');
+  if (!content || !DAILY_PHRASES[categoryKey]) return;
+  
+  const category = DAILY_PHRASES[categoryKey];
+  
+  content.innerHTML = `
+    <div class="category-header">
+      <h3>${category.icon} ${category.title}</h3>
+      <p class="category-description">${category.description}</p>
+    </div>
+    <div class="phrases-grid">
+      ${category.phrases.map(phrase => `
+        <div class="phrase-card enhanced">
+          <div class="phrase-arabic">${phrase.ar}</div>
+          <div class="phrase-english">${phrase.en}</div>
+          <div class="phrase-transliteration">${phrase.transliteration}</div>
+          <div class="phrase-usage">${phrase.usage}</div>
+          <button class="listen-btn btn-touch" data-text="${phrase.ar}">🔊 Listen</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  
+  // Add click handlers for listen buttons
+  content.querySelectorAll('.listen-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      speakAr(btn.dataset.text, 0.7);
+    });
+  });
+  
+  // Scroll to content
+  content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Function to show conversation
+function showConversation(conversationKey) {
+  const content = document.getElementById('phrasesContent');
+  if (!content || !ARABIC_CONVERSATIONS[conversationKey]) return;
+  
+  const conversation = ARABIC_CONVERSATIONS[conversationKey];
+  
+  content.innerHTML = `
+    <div class="conversation-header">
+      <h3>${conversation.icon} ${conversation.title}</h3>
+      <p class="conversation-description">${conversation.description}</p>
+    </div>
+    <div class="conversation-dialogue">
+      ${conversation.dialogue.map((line, index) => `
+        <div class="dialogue-line ${line.speaker.toLowerCase()}">
+          <div class="speaker-label">${line.speaker}:</div>
+          <div class="dialogue-content">
+            <div class="arabic-text">${line.ar}</div>
+            <div class="english-text">${line.en}</div>
+            ${line.role ? `<div class="role-label">${line.role}</div>` : ''}
+          </div>
+          ${line.ar ? `<button class="play-line btn-touch" data-text="${line.ar}">🔊</button>` : ''}
+        </div>
+      `).join('')}
+    </div>
+    ${conversation.notes ? `
+      <div class="conversation-notes">
+        <h4>💡 Learning Note:</h4>
+        <p>${conversation.notes}</p>
+      </div>
+    ` : ''}
+    <div class="conversation-actions">
+      <button class="play-all btn-touch">🎭 Play Full Conversation</button>
+      <button class="practice-btn btn-touch">🎯 Practice This Conversation</button>
+    </div>
+  `;
+  
+  // Add click handlers
+  content.querySelectorAll('.play-line').forEach(btn => {
+    btn.addEventListener('click', () => {
+      speakAr(btn.dataset.text, 0.75);
+    });
+  });
+  
+  // Play full conversation
+  const playAllBtn = content.querySelector('.play-all');
+  if (playAllBtn) {
+    playAllBtn.addEventListener('click', () => {
+      let delay = 0;
+      conversation.dialogue.forEach(line => {
+        if (line.ar) {
+          setTimeout(() => speakAr(line.ar, 0.75), delay);
+          delay += 2500; // Adjust timing between lines
+        }
+      });
+    });
+  }
+  
+  // Practice mode
+  const practiceBtn = content.querySelector('.practice-btn');
+  if (practiceBtn) {
+    practiceBtn.addEventListener('click', () => {
+      startConversationPractice(conversationKey);
+    });
+  }
+  
+  // Scroll to content
+  content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Function for conversation practice
+function startConversationPractice(conversationKey) {
+  const conversation = ARABIC_CONVERSATIONS[conversationKey];
+  if (!conversation) return;
+  
+  const content = document.getElementById('phrasesContent');
+  let currentLine = 0;
+  
+  function showPracticeLine() {
+    if (currentLine >= conversation.dialogue.length) {
+      content.innerHTML = `
+        <div class="practice-complete">
+          <h3>🎉 Conversation Practice Complete!</h3>
+          <p>Great job practicing "${conversation.title}"!</p>
+          <button class="btn-touch" onclick="showConversation('${conversationKey}')">Review Conversation</button>
+          <button class="primary btn-touch" onclick="route('phrases')">Back to Phrases</button>
+        </div>
+      `;
+      return;
+    }
+    
+    const line = conversation.dialogue[currentLine];
+    const nextLine = conversation.dialogue[currentLine + 1];
+    
+    content.innerHTML = `
+      <div class="practice-mode">
+        <h3>Practice Mode: ${conversation.title}</h3>
+        <div class="practice-progress">Line ${currentLine + 1} of ${conversation.dialogue.length}</div>
+        
+        <div class="practice-line">
+          <div class="speaker">${line.speaker} says:</div>
+          <div class="arabic-large">${line.ar}</div>
+          <div class="english-translation">${line.en}</div>
+          <button class="listen-btn btn-touch">🔊 Listen Again</button>
+        </div>
+        
+        ${nextLine ? `
+          <div class="your-turn">
+            <h4>Your turn! Try to say:</h4>
+            <div class="response-preview">
+              <div class="english-hint">${nextLine.en}</div>
+              <button class="reveal-btn btn-touch">Show Arabic</button>
+              <div class="arabic-answer" style="display: none;">${nextLine.ar}</div>
+            </div>
+          </div>
+        ` : ''}
+        
+        <div class="practice-controls">
+          <button class="next-btn primary btn-touch">Next →</button>
+          <button class="skip-btn btn-touch">Skip Practice</button>
+        </div>
+      </div>
+    `;
+    
+    // Event handlers
+    content.querySelector('.listen-btn')?.addEventListener('click', () => {
+      speakAr(line.ar, 0.7);
+    });
+    
+    content.querySelector('.reveal-btn')?.addEventListener('click', (e) => {
+      content.querySelector('.arabic-answer').style.display = 'block';
+      e.target.style.display = 'none';
+      if (nextLine) speakAr(nextLine.ar, 0.7);
+    });
+    
+    content.querySelector('.next-btn').addEventListener('click', () => {
+      currentLine++;
+      showPracticeLine();
+    });
+    
+    content.querySelector('.skip-btn').addEventListener('click', () => {
+      showConversation(conversationKey);
+    });
+    
+    // Auto-play current line
+    setTimeout(() => speakAr(line.ar, 0.7), 500);
+  }
+  
+  showPracticeLine();
+}
+
 // Make functions globally available for onclick handlers
 window.route = route;
 window.speakAr = speakAr;
@@ -1935,5 +2122,8 @@ window.startSpeedMode = startSpeedMode;
 window.startMemoryGame = startMemoryGame;
 window.startWordHunter = startWordHunter;
 window.startSpeedChallenge = startSpeedChallenge;
+window.showPhraseCategory = showPhraseCategory;
+window.showConversation = showConversation;
+window.startConversationPractice = startConversationPractice;
 
 })();
