@@ -1,143 +1,42 @@
-// Enhanced audio initialization for Samsung Galaxy Tab and other Android devices
+// Safe audio initialization without security warnings
 let audioInitialized = false;
-let audioContext = null;
+let firstInteraction = true;
 
-function initializeAudio() {
-  if (audioInitialized) return true;
+// Silent audio initialization on first user interaction
+function initAudioSilently() {
+  if (audioInitialized) return;
   
   try {
-    // Create audio context
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) {
-      audioContext = new AudioContext();
-      
-      // Resume if suspended (common on mobile)
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      
-      // Create a silent buffer to trigger audio system
-      const buffer = audioContext.createBuffer(1, 1, 22050);
-      const source = audioContext.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioContext.destination);
-      source.start(0);
-      
-      audioInitialized = true;
-      
-      // Hide the initialization button if it exists
-      const initBtn = document.getElementById('init-audio-btn');
-      if (initBtn) {
-        initBtn.style.display = 'none';
-      }
-      
-      // Show success message
-      showNotification('✅ Audio enabled successfully!');
-      
-      return true;
+    // For iOS devices
+    if (window.speechSynthesis) {
+      const utterance = new SpeechSynthesisUtterance('');
+      utterance.volume = 0;
+      speechSynthesis.speak(utterance);
     }
-  } catch (e) {
-    console.error('Audio initialization error:', e);
-    return false;
-  }
-  
-  return false;
-}
-
-function showNotification(message) {
-  const notification = document.createElement('div');
-  notification.className = 'audio-notification';
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #10b981;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    z-index: 10000;
-    animation: slideDown 0.3s ease;
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.animation = 'slideUp 0.3s ease';
-    setTimeout(() => document.body.removeChild(notification), 300);
-  }, 2000);
-}
-
-// Add CSS animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideDown {
-    from { transform: translate(-50%, -100%); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
-  }
-  @keyframes slideUp {
-    from { transform: translate(-50%, 0); opacity: 1; }
-    to { transform: translate(-50%, -100%); opacity: 0; }
-  }
-  
-  .audio-init-banner {
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    color: white;
-    padding: 16px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
-  .audio-init-banner button {
-    background: white;
-    color: #ef4444;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-left: 12px;
-  }
-  
-  .audio-init-banner button:active {
-    transform: scale(0.95);
-  }
-`;
-document.head.appendChild(style);
-
-// Check if audio needs initialization (especially for Samsung/Android)
-function checkAudioSupport() {
-  const isAndroid = /android/i.test(navigator.userAgent);
-  const isSamsung = /samsung/i.test(navigator.userAgent);
-  const isTablet = /tablet|ipad|playbook|silk/i.test(navigator.userAgent) || 
-                   (isAndroid && !/mobile/i.test(navigator.userAgent));
-  
-  if ((isAndroid || isSamsung || isTablet) && !audioInitialized) {
-    // Show initialization banner
-    const banner = document.createElement('div');
-    banner.className = 'audio-init-banner';
-    banner.id = 'init-audio-btn';
-    banner.innerHTML = `
-      <span>🔊 Tap to enable audio for Arabic pronunciation</span>
-      <button onclick="initializeAudio()">Enable Audio</button>
-    `;
     
-    // Insert at the beginning of body
-    document.body.insertBefore(banner, document.body.firstChild);
+    // Create audio context if needed
+    if (window.AudioContext || window.webkitAudioContext) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const context = new AudioContext();
+      
+      if (context.state === 'suspended') {
+        context.resume();
+      }
+    }
+    
+    audioInitialized = true;
+  } catch (e) {
+    // Silently fail - will try again on next interaction
+    console.log('Audio init deferred');
   }
 }
 
-// Enhanced speech synthesis with fallback
+// Enhanced speech synthesis for all devices
 function enhancedSpeak(text, lang = 'ar-SA', rate = 0.85) {
-  // First try to initialize audio if not done
-  if (!audioInitialized) {
-    initializeAudio();
+  // Initialize audio on first attempt
+  if (firstInteraction) {
+    initAudioSilently();
+    firstInteraction = false;
   }
   
   if (!window.speechSynthesis) {
@@ -149,61 +48,115 @@ function enhancedSpeak(text, lang = 'ar-SA', rate = 0.85) {
     // Cancel any ongoing speech
     speechSynthesis.cancel();
     
-    // Create utterance
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Get available voices
-    const voices = speechSynthesis.getVoices();
-    
-    // Find Arabic voice
-    const arabicVoice = voices.find(v => v.lang.includes('ar')) ||
-                        voices.find(v => v.lang.includes('AR')) ||
-                        voices.find(v => v.name.includes('Arabic'));
-    
-    if (arabicVoice) {
-      utterance.voice = arabicVoice;
-      utterance.lang = arabicVoice.lang;
-    } else {
-      utterance.lang = lang;
-    }
-    
-    utterance.rate = rate;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-    
-    // Error handling
-    utterance.onerror = (e) => {
-      console.error('Speech error:', e);
-      // Try fallback
-      if (e.error === 'not-allowed') {
-        showNotification('⚠️ Please tap "Enable Audio" first');
+    // Small delay for better compatibility
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Get available voices
+      const voices = speechSynthesis.getVoices();
+      
+      // Find best Arabic voice
+      let arabicVoice = voices.find(v => 
+        v.lang.includes('ar-') || 
+        v.lang === 'ar' || 
+        v.lang.includes('AR')
+      );
+      
+      // Fallback to any Arabic-named voice
+      if (!arabicVoice) {
+        arabicVoice = voices.find(v => 
+          v.name.toLowerCase().includes('arabic') ||
+          v.name.includes('صوت') // Arabic word for voice
+        );
       }
-    };
-    
-    // Speak
-    speechSynthesis.speak(utterance);
+      
+      if (arabicVoice) {
+        utterance.voice = arabicVoice;
+        utterance.lang = arabicVoice.lang;
+      } else {
+        // Use language tag even without specific voice
+        utterance.lang = lang;
+      }
+      
+      utterance.rate = rate;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      // Error handling
+      utterance.onerror = (e) => {
+        if (e.error === 'not-allowed') {
+          // Try to reinitialize on next interaction
+          audioInitialized = false;
+          firstInteraction = true;
+        }
+      };
+      
+      // Speak
+      speechSynthesis.speak(utterance);
+    }, 10);
     
   } catch (e) {
-    console.error('Enhanced speak error:', e);
-    showNotification('⚠️ Audio error - please refresh the page');
+    console.error('Speech error:', e);
   }
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-  checkAudioSupport();
-  
-  // Auto-initialize on first user interaction
-  const autoInit = () => {
-    initializeAudio();
-    document.removeEventListener('click', autoInit);
-    document.removeEventListener('touchstart', autoInit);
+// Initialize on first user interaction (any click or touch)
+if (typeof document !== 'undefined') {
+  const initOnInteraction = () => {
+    initAudioSilently();
+    // Keep listener for subsequent interactions if needed
   };
   
-  document.addEventListener('click', autoInit, { once: true });
-  document.addEventListener('touchstart', autoInit, { once: true });
-});
+  // Add listeners for various interaction types
+  document.addEventListener('click', initOnInteraction, { passive: true });
+  document.addEventListener('touchstart', initOnInteraction, { passive: true });
+  document.addEventListener('touchend', initOnInteraction, { passive: true });
+  
+  // Load voices when available
+  if (window.speechSynthesis) {
+    // Some browsers need time to load voices
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.addEventListener('voiceschanged', () => {
+        // Voices are now available
+        console.log('Voices loaded:', speechSynthesis.getVoices().length);
+      });
+    }
+    
+    // For browsers that already have voices
+    setTimeout(() => {
+      const voices = speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        console.log('Voices available:', voices.length);
+      }
+    }, 100);
+  }
+}
 
-// Make functions globally available
-window.initializeAudio = initializeAudio;
+// Compatibility fixes for various browsers
+(function() {
+  // Fix for Chrome on Android
+  if (/Chrome/.test(navigator.userAgent) && /Android/.test(navigator.userAgent)) {
+    const originalSpeak = window.speechSynthesis.speak;
+    window.speechSynthesis.speak = function(utterance) {
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        originalSpeak.call(window.speechSynthesis, utterance);
+      }, 10);
+    };
+  }
+  
+  // Fix for Safari on iOS
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && window.speechSynthesis) {
+        // Resume speech synthesis when app becomes visible
+        if (speechSynthesis.paused) {
+          speechSynthesis.resume();
+        }
+      }
+    });
+  }
+})();
+
+// Make function globally available
 window.enhancedSpeak = enhancedSpeak;
