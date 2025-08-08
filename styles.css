@@ -1569,6 +1569,39 @@ main#app {
   }
 }
 
+/* Quiz Enhancement Styles */
+.hint-btn {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  margin: 12px 0;
+  padding: 10px 20px;
+  font-weight: 600;
+}
+
+.hint-btn:hover {
+  transform: scale(1.05);
+}
+
+.hint-btn:active {
+  transform: scale(0.95);
+}
+
+/* Disable buttons during processing */
+.option-btn:disabled, 
+.trans-option:disabled, 
+.pos-option:disabled, 
+.letter-option:disabled,
+.quiz-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.score-message {
+  font-size: 1.3rem;
+  margin: 20px 0;
+}
+
 /* Enhanced Quiz Styles */
 .quiz-features {
   font-size: 0.85rem;
