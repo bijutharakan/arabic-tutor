@@ -203,7 +203,7 @@
   border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
   display: flex;
   align-items: center;
   gap: 10px;
@@ -275,7 +275,7 @@
 }
 
 .font-option-name {
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
   color: #2d3748;
   margin-bottom: 3px;
 }

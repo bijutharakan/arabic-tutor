@@ -27,11 +27,24 @@ body {
   line-height: 1.6;
 }
 
-/* Ensure English text always uses Fredoka */
+/* Ensure English text always uses Fredoka with normal weight */
 h1, h2, h3, h4, h5, h6,
 p, span, div, button, label, input, select, textarea,
 .tag, .controls, .hero, .card, .btn, .button {
   font-family: "Fredoka", system-ui, -apple-system, sans-serif !important;
+}
+
+/* Reset font weights to normal */
+p, span, div, label, td, li {
+  font-weight: 400;
+}
+
+h1 {
+  font-weight: 600; /* Slightly bold for main header only */
+}
+
+h2, h3, h4, h5, h6 {
+  font-weight: 500; /* Medium weight for subheaders */
 }
 
 /* Arabic Text Base Styles */
@@ -97,7 +110,7 @@ button, select, label.toggle, label.tts {
   border: 0;
   padding: 10px 14px;
   border-radius: 16px;
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 to 500 */
   background: #ffffff;
   color: #111827;
   box-shadow: var(--shadow);
@@ -118,7 +131,7 @@ button.big {
 }
 
 button.primary { 
-  background: #111827; 
+  background: var(--brand); /* Use brand color instead of dark gray */
   color: white; 
 }
 
@@ -220,7 +233,7 @@ main#app {
 }
 
 .form-label {
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
   color: var(--muted);
   font-size: 0.9rem;
 }
@@ -261,7 +274,7 @@ main#app {
   padding: 12px;
   border-radius: 12px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
 }
 
 .description {
@@ -307,7 +320,7 @@ main#app {
 }
 
 .wordcard .eng { 
-  font-weight: 700;
+  font-weight: 500; /* Reduced from 700 */
   font-size: 1.1rem;
   grid-column: 2;
   grid-row: 2;
@@ -366,7 +379,7 @@ main#app {
 }
 
 .english-phrase {
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
   font-size: 1.1rem;
   color: var(--ink);
 }
@@ -403,7 +416,7 @@ main#app {
   border: 2px solid #e5e7eb;
   padding: 12px 16px;
   border-radius: 12px;
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
   transition: all 0.2s;
   text-align: left;
 }
@@ -463,7 +476,7 @@ main#app {
 
 .phrase-english {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
   color: var(--ink);
   margin-bottom: 6px;
 }
@@ -488,7 +501,7 @@ main#app {
   background: linear-gradient(135deg, #10b981, #3b82f6);
   color: white;
   padding: 10px;
-  font-weight: 600;
+  font-weight: 500; /* Reduced from 600 */
 }
 
 /* Conversations */
@@ -531,7 +544,7 @@ main#app {
 }
 
 .speaker-label {
-  font-weight: 700;
+  font-weight: 600; /* Reduced from 700 */
   color: var(--brand);
   text-align: right;
 }
