@@ -2,7 +2,8 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Arabic Tutor — Interactive Learning</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,18 +16,26 @@
       <h1>Arabic Tutor</h1>
       <p class="tag">English-first • Picture-rich • Fun & Interactive</p>
       <div class="controls">
-        <button data-view="letters" class="primary big">📚 Learn Letters</button>
-        <button data-view="words" class="big">🐾 Learn Words</button>
+        <button data-view="letters" class="primary big">📚 Letters</button>
+        <button data-view="letterforms" class="big">✍️ Letter Forms</button>
+        <button data-view="diacritics" class="big">🔤 Diacritics</button>
+        <button data-view="words" class="big">🐾 Words</button>
+        <button data-view="phrases" class="big">💬 Phrases</button>
         <button data-view="quizzes" class="big">🎯 Quizzes</button>
         <button data-view="games" class="big">🎮 Games</button>
+        <button data-view="tutorials" class="big">📖 Tutorials</button>
       </div>
       <div class="controls">
-        <label class="tts">🔊 Letter Voice
+        <label class="tts">🔊 Voice
           <select id="voiceSelect"></select>
         </label>
         <label class="toggle">
           <input type="checkbox" id="hintsToggle" checked />
-          Show English name & phonics
+          Show hints & phonics
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="harakatToggle" />
+          Show harakat (diacritics)
         </label>
       </div>
     </div>
@@ -35,7 +44,7 @@
   <main id="app"><noscript>Please enable JavaScript.</noscript></main>
 
   <footer>
-    <small>v3.1 • Works best via a local server (see README)</small>
+    <small>Learn Arabic interactively • Works best on modern browsers</small>
   </footer>
 
   <script src="data.js"></script>
