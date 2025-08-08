@@ -470,35 +470,87 @@ const Views = {
   },
 
   tutorials() {
-    app.innerHTML = `
-      <div class="section">
-        <h2>📖 Tutorials</h2>
-        <div class="pill">Learn how Arabic works</div>
-      </div>
-      <div class="tutorial-list">
-        <div class="tutorial-card">
-          <h3>🔤 How Letters Connect</h3>
-          <p>Learn the rules of Arabic letter connections</p>
-          <button class="start-tutorial btn-touch" data-tutorial="connections">Start Tutorial</button>
+    // Check if comprehensive tutorials are loaded
+    const hasAdvancedTutorials = typeof TUTORIALS_DATA !== 'undefined';
+    
+    if (hasAdvancedTutorials) {
+      // Show comprehensive tutorial categories
+      let categoriesHTML = '';
+      for (const [key, category] of Object.entries(TUTORIAL_CATEGORIES)) {
+        categoriesHTML += `
+          <div class="tutorial-category">
+            <h3>${category.title}</h3>
+            <p class="category-desc">${category.description}</p>
+            <div class="tutorial-grid">`;
+        
+        category.tutorials.forEach(tutorialId => {
+          const tutorial = TUTORIALS_DATA[tutorialId];
+          if (tutorial) {
+            categoriesHTML += `
+              <div class="tutorial-card">
+                <div class="tutorial-header">
+                  <span class="tutorial-icon">${tutorial.title.charAt(0)}</span>
+                  <span class="tutorial-level">${tutorial.level}</span>
+                </div>
+                <h4>${tutorial.title.substring(2)}</h4>
+                <p>${tutorial.description}</p>
+                <div class="tutorial-meta">
+                  <span>⏱️ ${tutorial.duration}</span>
+                  <span>📚 ${tutorial.steps.length} lessons</span>
+                </div>
+                <button class="start-tutorial primary btn-touch" data-tutorial="${tutorialId}">Start Learning</button>
+              </div>`;
+          }
+        });
+        
+        categoriesHTML += `</div></div>`;
+      }
+      
+      // Add daily tip
+      const tipIndex = new Date().getDate() % LEARNING_TIPS.length;
+      const dailyTip = LEARNING_TIPS[tipIndex];
+      
+      app.innerHTML = `
+        <div class="section">
+          <h2>📖 Comprehensive Arabic Learning</h2>
+          <div class="pill">Structured lessons to master Arabic</div>
+          <div class="daily-tip">${dailyTip}</div>
         </div>
-        <div class="tutorial-card">
-          <h3>📝 Writing Direction</h3>
-          <p>Arabic is written from right to left</p>
-          <button class="start-tutorial btn-touch" data-tutorial="direction">Start Tutorial</button>
+        ${categoriesHTML}
+        <div id="tutorialArea"></div>
+      `;
+    } else {
+      // Fallback to simple tutorials
+      app.innerHTML = `
+        <div class="section">
+          <h2>📖 Tutorials</h2>
+          <div class="pill">Learn how Arabic works</div>
         </div>
-        <div class="tutorial-card">
-          <h3>🎵 Vowel Sounds</h3>
-          <p>Understanding harakat and vowel marks</p>
-          <button class="start-tutorial btn-touch" data-tutorial="vowels">Start Tutorial</button>
+        <div class="tutorial-list">
+          <div class="tutorial-card">
+            <h3>🔤 How Letters Connect</h3>
+            <p>Learn the rules of Arabic letter connections</p>
+            <button class="start-tutorial btn-touch" data-tutorial="connections">Start Tutorial</button>
+          </div>
+          <div class="tutorial-card">
+            <h3>📝 Writing Direction</h3>
+            <p>Arabic is written from right to left</p>
+            <button class="start-tutorial btn-touch" data-tutorial="direction">Start Tutorial</button>
+          </div>
+          <div class="tutorial-card">
+            <h3>🎵 Vowel Sounds</h3>
+            <p>Understanding harakat and vowel marks</p>
+            <button class="start-tutorial btn-touch" data-tutorial="vowels">Start Tutorial</button>
+          </div>
+          <div class="tutorial-card">
+            <h3>🏗️ Building Words</h3>
+            <p>How to combine letters into words</p>
+            <button class="start-tutorial btn-touch" data-tutorial="words">Start Tutorial</button>
+          </div>
         </div>
-        <div class="tutorial-card">
-          <h3>🏗️ Building Words</h3>
-          <p>How to combine letters into words</p>
-          <button class="start-tutorial btn-touch" data-tutorial="words">Start Tutorial</button>
-        </div>
-      </div>
-      <div id="tutorialArea"></div>
-    `;
+        <div id="tutorialArea"></div>
+      `;
+    }
     
     document.querySelectorAll('.start-tutorial').forEach(btn => {
       btn.addEventListener('click', () => startTutorial(btn.dataset.tutorial));
@@ -1071,6 +1123,132 @@ function startSpeedChallenge() {
 function startTutorial(type) {
   const area = document.getElementById('tutorialArea');
   
+  // Check if comprehensive tutorials are available
+  if (typeof TUTORIALS_DATA !== 'undefined' && TUTORIALS_DATA[type]) {
+    const tutorial = TUTORIALS_DATA[type];
+    let currentStep = 0;
+    
+    // Scroll to tutorial area
+    setTimeout(() => {
+      area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+    
+    function showStep() {
+      const step = tutorial.steps[currentStep];
+      
+      // Generate practice exercise if available
+      let exerciseHTML = '';
+      if (tutorial.quiz && typeof TUTORIAL_EXERCISES !== 'undefined') {
+        const exerciseType = tutorial.quiz.type;
+        if (TUTORIAL_EXERCISES[exerciseType]) {
+          exerciseHTML = `
+            <div class="step-exercise">
+              <h4>Try it yourself:</h4>
+              <button class="practice-btn btn-touch" data-exercise="${exerciseType}">Practice Exercise</button>
+            </div>`;
+        }
+      }
+      
+      area.innerHTML = `
+        <div class="tutorial-content enhanced">
+          <div class="tutorial-header-full">
+            <h3>${tutorial.title}</h3>
+            <span class="tutorial-level-badge">${tutorial.level}</span>
+          </div>
+          <div class="step-indicator">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${((currentStep + 1) / tutorial.steps.length) * 100}%"></div>
+            </div>
+            <span>Lesson ${currentStep + 1} of ${tutorial.steps.length}</span>
+          </div>
+          <div class="step-content">
+            ${step.title ? `<h4 class="step-title">${step.title}</h4>` : ''}
+            <p class="step-text">${step.content}</p>
+            <div class="step-example">
+              <div class="example-label">Example:</div>
+              <div class="example-content">${step.example.replace(/\n/g, '<br>')}</div>
+            </div>
+            ${step.practice ? `
+              <div class="step-practice">
+                <div class="practice-label">Practice:</div>
+                <div class="practice-content">${step.practice}</div>
+              </div>` : ''}
+            ${step.tip ? `
+              <div class="step-tip">
+                ${step.tip}
+              </div>` : ''}
+            ${exerciseHTML}
+          </div>
+          <div class="tutorial-nav">
+            ${currentStep > 0 ? '<button class="prev-btn btn-touch">← Previous</button>' : '<div></div>'}
+            ${currentStep < tutorial.steps.length - 1 ? 
+              '<button class="next-btn primary btn-touch">Next →</button>' :
+              '<button class="complete-btn primary btn-touch">Complete ✓</button>'
+            }
+          </div>
+        </div>
+      `;
+      
+      // Event listeners
+      area.querySelector('.prev-btn')?.addEventListener('click', () => {
+        currentStep--;
+        showStep();
+      });
+      
+      area.querySelector('.next-btn')?.addEventListener('click', () => {
+        currentStep++;
+        showStep();
+      });
+      
+      area.querySelector('.complete-btn')?.addEventListener('click', () => {
+        area.innerHTML = `
+          <div class="tutorial-complete">
+            <div class="completion-icon">🎉</div>
+            <h3>Tutorial Complete!</h3>
+            <p>Excellent work completing <strong>${tutorial.title}</strong>!</p>
+            <div class="completion-stats">
+              <div>📚 ${tutorial.steps.length} lessons completed</div>
+              <div>⏱️ ${tutorial.duration} of focused learning</div>
+            </div>
+            <div class="next-steps">
+              <p>Ready for more?</p>
+              <button class="primary btn-touch" onclick="route('tutorials')">Explore More Tutorials</button>
+              <button class="btn-touch" onclick="route('quizzes')">Test Your Knowledge</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      area.querySelector('.practice-btn')?.addEventListener('click', (e) => {
+        const exerciseType = e.target.dataset.exercise;
+        if (TUTORIAL_EXERCISES[exerciseType]) {
+          const exercise = TUTORIAL_EXERCISES[exerciseType].generateExercise();
+          showModal(`
+            <h3>Practice Exercise</h3>
+            <p>${exercise.instruction}</p>
+            <div class="exercise-content">
+              ${JSON.stringify(exercise)}
+            </div>
+          `);
+        }
+      });
+      
+      // Speak Arabic examples
+      if (step.example && /[\u0600-\u06FF]/.test(step.example)) {
+        const arabicParts = step.example.match(/[\u0600-\u06FF]+/g);
+        if (arabicParts && arabicParts.length > 0) {
+          setTimeout(() => {
+            speakAr(arabicParts[0], 0.7);
+          }, 500);
+        }
+      }
+    }
+    
+    showStep();
+    return;
+  }
+  
+  // Fallback to simple tutorials
   const tutorials = {
     connections: {
       title: "How Letters Connect",
