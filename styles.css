@@ -62,3 +62,195 @@ main#app { max-width: 1100px; margin: 24px auto 60px; padding: 0 16px; }
 .wordcard .ar { font-family:"Cairo"; font-size: 44px; }
 .wordcard .eng { font-weight:800;}
 .help { color: var(--muted); font-size:1rem; }
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  margin: 20px;
+  text-align: center;
+}
+
+.modal-content p {
+  margin: 0 0 20px 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.modal-content .glyph {
+  font-family: "Cairo", sans-serif;
+  font-size: 48px;
+}
+
+/* Active button state */
+.catbar button.active {
+  background: var(--accent);
+  color: white;
+}
+
+/* Score display */
+.score {
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+  color: white;
+  padding: 24px;
+  border-radius: 16px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Memory game */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.memory-card {
+  aspect-ratio: 1;
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+
+.memory-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-back, .card-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  backface-visibility: hidden;
+}
+
+.card-back {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.card-front {
+  background: white;
+  border: 2px solid #e5e7eb;
+  transform: rotateY(180deg);
+}
+
+.card-front .glyph {
+  font-family: "Cairo", sans-serif;
+  font-size: 3rem;
+}
+
+.card-front .name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Collector game */
+.collector-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.collector-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 16px;
+}
+
+.collector-cell {
+  aspect-ratio: 1;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Cairo", sans-serif;
+  font-size: 1.5rem;
+  position: relative;
+}
+
+.collector-cell.player {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.collector-cell.player::after {
+  content: "😊";
+  font-size: 1.2rem;
+  position: absolute;
+}
+
+.collector-cell.letter {
+  background: #ecfdf5;
+  border-color: #10b981;
+}
+
+/* Word builder progress */
+#progress {
+  display: inline-flex;
+  gap: 8px;
+  font-family: "Cairo", sans-serif;
+  font-size: 2rem;
+}
+
+#progress .done {
+  color: #10b981;
+}
+
+#progress .current {
+  color: #f59e0b;
+  animation: pulse 1s infinite;
+}
+
+#progress .pending {
+  color: #cbd5e1;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .memory-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .collector-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
