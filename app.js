@@ -363,42 +363,102 @@ const Views = {
   },
 
   phrases() {
-    app.innerHTML = `
-      <div class="section">
-        <h2>💬 Common Phrases</h2>
-        <div class="pill">Essential Arabic phrases for daily use</div>
-      </div>
-      <div class="grid" id="phrasesGrid"></div>
-    `;
+    // Check if comprehensive phrases are loaded
+    const hasComprehensivePhrases = typeof DAILY_PHRASES !== 'undefined';
+    const hasConversations = typeof ARABIC_CONVERSATIONS !== 'undefined';
     
-    const grid = document.getElementById('phrasesGrid');
-    const categories = [...new Set(PHRASES.map(p => p.category))];
-    
-    categories.forEach(cat => {
-      const section = document.createElement('div');
-      section.className = 'phrase-section';
-      section.innerHTML = `<h3>${cat.charAt(0).toUpperCase() + cat.slice(1)}</h3>`;
+    if (hasComprehensivePhrases) {
+      // Show category navigation
+      const categories = Object.keys(DAILY_PHRASES);
+      const categoryButtons = categories.map(cat => `
+        <button class="cat-btn btn-touch" data-category="${cat}">
+          ${DAILY_PHRASES[cat].icon} ${DAILY_PHRASES[cat].title.split(' ').slice(1).join(' ')}
+        </button>
+      `).join('');
       
-      const phrasesInCat = PHRASES.filter(p => p.category === cat);
-      phrasesInCat.forEach(phrase => {
-        const card = document.createElement('div');
-        card.className = 'card phrase-card';
-        card.innerHTML = `
-          <div class="arabic-phrase">${phrase.ar}</div>
-          <div class="english-phrase">${phrase.en}</div>
-          <div class="transliteration">${phrase.transliteration}</div>
-          <button class="say btn-touch">🔊 Listen</button>
-        `;
-        
-        card.querySelector('.say').addEventListener('click', () => {
-          speakAr(phrase.ar, 0.75);
+      app.innerHTML = `
+        <div class="section">
+          <h2>💬 Daily Life Phrases & Conversations</h2>
+          <div class="pill">250+ phrases in 16 categories • 10 full conversation dialogues</div>
+        </div>
+        <div class="phrase-navigation">
+          <div class="nav-section">
+            <h3>📚 Phrase Categories</h3>
+            <div class="category-buttons">
+              ${categoryButtons}
+            </div>
+          </div>
+          ${hasConversations ? `
+          <div class="nav-section">
+            <h3>🗣️ Practice Conversations</h3>
+            <div class="conversation-buttons">
+              ${Object.keys(ARABIC_CONVERSATIONS).map(conv => `
+                <button class="conv-btn btn-touch" data-conversation="${conv}">
+                  ${ARABIC_CONVERSATIONS[conv].icon} ${ARABIC_CONVERSATIONS[conv].title.split(' ').slice(1).join(' ')}
+                </button>
+              `).join('')}
+            </div>
+          </div>` : ''}
+        </div>
+        <div id="phrasesContent"></div>
+      `;
+      
+      // Category button handlers
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showPhraseCategory(btn.dataset.category);
         });
-        
-        section.appendChild(card);
       });
       
-      grid.appendChild(section);
-    });
+      // Conversation button handlers
+      document.querySelectorAll('.conv-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showConversation(btn.dataset.conversation);
+        });
+      });
+      
+      // Show first category by default
+      showPhraseCategory('greetings');
+      
+    } else {
+      // Fallback to simple phrases
+      app.innerHTML = `
+        <div class="section">
+          <h2>💬 Common Phrases</h2>
+          <div class="pill">Essential Arabic phrases for daily use</div>
+        </div>
+        <div class="grid" id="phrasesGrid"></div>
+      `;
+      
+      const grid = document.getElementById('phrasesGrid');
+      const categories = [...new Set(PHRASES.map(p => p.category))];
+      
+      categories.forEach(cat => {
+        const section = document.createElement('div');
+        section.className = 'phrase-section';
+        section.innerHTML = `<h3>${cat.charAt(0).toUpperCase() + cat.slice(1)}</h3>`;
+        
+        const phrasesInCat = PHRASES.filter(p => p.category === cat);
+        phrasesInCat.forEach(phrase => {
+          const card = document.createElement('div');
+          card.className = 'card phrase-card';
+          card.innerHTML = `
+            <div class="arabic-phrase">${phrase.ar}</div>
+            <div class="english-phrase">${phrase.en}</div>
+            <div class="transliteration">${phrase.transliteration}</div>
+            <button class="say btn-touch">🔊 Listen</button>
+          `;
+          
+          card.querySelector('.say').addEventListener('click', () => {
+            speakAr(phrase.ar, 0.75);
+          });
+          
+          section.appendChild(card);
+        });
+        
+        grid.appendChild(section);
+      });
+    }
   },
 
   quizzes() {
