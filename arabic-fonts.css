@@ -148,15 +148,15 @@
 
 /* Font Switcher Styles */
 .font-switcher {
-  display: inline-block;
-  margin-top: 15px;
-  margin-left: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.98);
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 10px;
   min-width: 200px;
-  position: relative;
+  z-index: 1000;
 }
 
 .font-switcher-toggle {
@@ -180,9 +180,17 @@
 
 .font-options {
   display: none;
-  margin-top: 10px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 5px;
   max-height: 400px;
   overflow-y: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
 }
 
 .font-options.active {
@@ -287,9 +295,13 @@
   }
   
   .font-switcher {
-    margin-top: 10px;
-    margin-left: 10px;
+    top: 10px;
+    right: 10px;
     min-width: 180px;
+  }
+  
+  .font-size-controls {
+    display: none !important; /* Hide on mobile to save space */
   }
   
   .with-harakat {
@@ -307,9 +319,15 @@
   }
   
   .font-switcher {
-    margin-top: 10px;
-    margin-left: 5px;
+    top: 5px;
+    right: 5px;
     min-width: 150px;
+    padding: 8px;
+  }
+  
+  .font-switcher-toggle {
+    font-size: 12px;
+    padding: 6px 10px;
   }
 }
 

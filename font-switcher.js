@@ -136,13 +136,8 @@ class FontSwitcher {
       </div>
     `;
 
-    // Add to header instead of body
-    const header = document.querySelector('.hero-inner');
-    if (header) {
-      header.appendChild(switcher);
-    } else {
-      document.body.appendChild(switcher);
-    }
+    // Add to body (will be positioned fixed in top-right)
+    document.body.appendChild(switcher);
     
     // Store references
     this.switcher = switcher;
@@ -386,11 +381,37 @@ document.addEventListener('DOMContentLoaded', () => {
     subtree: true
   });
   
-  // Add font size controls (removed - no longer needed)
+  // Add compact font size controls
+  const addFontSizeControls = () => {
+    const controls = document.createElement('div');
+    controls.className = 'font-size-controls';
+    controls.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 230px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 5px;
+      display: flex;
+      gap: 3px;
+      align-items: center;
+    `;
+    
+    controls.innerHTML = `
+      <span style="font-size: 12px; color: #666; margin-right: 5px;">Size:</span>
+      <button class="size-btn" onclick="adjustFontSize(-0.1)" style="padding: 3px 8px; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; background: white; font-size: 12px;">A-</button>
+      <button class="size-btn" onclick="adjustFontSize(0.1)" style="padding: 3px 8px; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; background: white; font-size: 12px;">A+</button>
+      <button class="size-btn" onclick="resetFontSize()" style="padding: 3px 8px; border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer; background: white; font-size: 11px;">↺</button>
+    `;
+    
+    document.body.appendChild(controls);
+  };
   
   // Font size adjustment functions
   window.adjustFontSize = (delta) => {
-    const arabicElements = document.querySelectorAll('.arabic, .arabic-text, [lang="ar"]');
+    const arabicElements = document.querySelectorAll('.glyph, .arabic, .arabic-text, .ar, [lang="ar"]');
     arabicElements.forEach(el => {
       const currentSize = parseFloat(window.getComputedStyle(el).fontSize);
       el.style.fontSize = `${currentSize + (currentSize * delta)}px`;
@@ -398,13 +419,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   
   window.resetFontSize = () => {
-    const arabicElements = document.querySelectorAll('.arabic, .arabic-text, [lang="ar"]');
+    const arabicElements = document.querySelectorAll('.glyph, .arabic, .arabic-text, .ar, [lang="ar"]');
     arabicElements.forEach(el => {
       el.style.fontSize = '';
     });
   };
   
-  // Font size controls removed - no longer needed
+  // Add font size controls after a delay
+  setTimeout(addFontSizeControls, 100);
   
   // Re-apply font after app initialization to catch any missed elements
   setTimeout(() => {
