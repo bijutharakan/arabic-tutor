@@ -147,6 +147,20 @@ function route(view){
   document.querySelectorAll('[data-view]').forEach(btn => {
     btn.classList.toggle('primary', btn.dataset.view === view);
   });
+  
+  // Auto-scroll on mobile devices to show content
+  if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+    setTimeout(() => {
+      const mainContent = document.getElementById('app');
+      if (mainContent) {
+        const offset = mainContent.offsetTop - 20;
+        window.scrollTo({
+          top: offset,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+  }
 }
 
 const Views = {
@@ -325,9 +339,9 @@ const Views = {
           <div class="kidpic">${w.pic}</div>
           <div class="ar">${showHarakat ? w.harakat : w.ar}</div>
           <div class="eng">${w.en}</div>
-          <div class="row">
-            <button class="say btn-touch">🔊 Word</button>
-            <button class="spell btn-touch">Spell</button>
+          <div class="btn-group">
+            <button class="icon-btn say btn-touch" title="Listen to word">🔊</button>
+            <button class="icon-btn spell btn-touch" title="Spell letters">🔤</button>
           </div>
         `;
         
