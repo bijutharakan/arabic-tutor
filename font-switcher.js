@@ -212,29 +212,26 @@ class FontSwitcher {
     const font = ARABIC_FONTS.find(f => f.id === fontId);
     if (!font) return;
 
-    // Remove all font classes
+    // Remove all font classes from body
     ARABIC_FONTS.forEach(f => {
       document.body.classList.remove(f.class);
     });
 
-    // Add new font class
+    // Add new font class to body (for CSS cascading)
     document.body.classList.add(font.class);
 
-    // Apply to all Arabic text elements - INCLUDING GLYPH!
+    // Note: The actual font application happens through CSS rules that target
+    // .font-xxx .glyph, .font-xxx .arabic, etc.
+    // This ensures English text remains in Fredoka font
+
+    // Add switching animation to Arabic elements only
     const arabicElements = document.querySelectorAll(
       '.glyph, .form-glyph, .arabic, .arabic-text, .ar, [lang="ar"], ' +
-      '.letter-card .glyph, .word-arabic, .arabic-phrase, ' +
-      '.phrase-arabic, .conversation-arabic, .large-arabic, .arabic-large, ' +
-      '.vowel-box, .tutorial-arabic, .quiz-arabic, .vocabulary-arabic, ' +
-      '.letter-display, .arabic-display, .harakat-display'
+      '.word-arabic, .arabic-phrase, .phrase-arabic, .conversation-arabic, ' +
+      '.large-arabic, .arabic-large, .vowel-box'
     );
 
     arabicElements.forEach(element => {
-      // Remove old font classes
-      ARABIC_FONTS.forEach(f => element.classList.remove(f.class));
-      // Add new font class
-      element.classList.add(font.class);
-      // Add switching animation
       element.classList.add('font-switching');
       setTimeout(() => element.classList.remove('font-switching'), 300);
     });

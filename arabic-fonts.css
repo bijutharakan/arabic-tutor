@@ -12,10 +12,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Mirza:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&display=swap');
 
-/* Font Classes for Different Arabic Fonts */
+/* Font Classes for Different Arabic Fonts - Only apply to Arabic text */
 
 /* 1. Amiri - Traditional, excellent for classical texts and Quran */
-.font-amiri {
+.font-amiri .glyph,
+.font-amiri .arabic,
+.font-amiri .arabic-text,
+.font-amiri .ar,
+.font-amiri [lang="ar"] {
   font-family: 'Amiri', serif !important;
   font-size: 1.2em;
   line-height: 2;
@@ -23,7 +27,11 @@
 }
 
 /* 2. Noto Naskh Arabic - Clear, modern, great for learning */
-.font-noto-naskh {
+.font-noto-naskh .glyph,
+.font-noto-naskh .arabic,
+.font-noto-naskh .arabic-text,
+.font-noto-naskh .ar,
+.font-noto-naskh [lang="ar"] {
   font-family: 'Noto Naskh Arabic', serif !important;
   font-size: 1.15em;
   line-height: 1.9;
@@ -31,7 +39,11 @@
 }
 
 /* 3. Cairo - Modern, clean, good for UI */
-.font-cairo {
+.font-cairo .glyph,
+.font-cairo .arabic,
+.font-cairo .arabic-text,
+.font-cairo .ar,
+.font-cairo [lang="ar"] {
   font-family: 'Cairo', sans-serif !important;
   font-size: 1.1em;
   line-height: 1.8;
@@ -39,7 +51,11 @@
 }
 
 /* 4. Tajawal - Simple, clear, good readability */
-.font-tajawal {
+.font-tajawal .glyph,
+.font-tajawal .arabic,
+.font-tajawal .arabic-text,
+.font-tajawal .ar,
+.font-tajawal [lang="ar"] {
   font-family: 'Tajawal', sans-serif !important;
   font-size: 1.1em;
   line-height: 1.8;
@@ -47,7 +63,11 @@
 }
 
 /* 5. Almarai - Modern, clean lines */
-.font-almarai {
+.font-almarai .glyph,
+.font-almarai .arabic,
+.font-almarai .arabic-text,
+.font-almarai .ar,
+.font-almarai [lang="ar"] {
   font-family: 'Almarai', sans-serif !important;
   font-size: 1.1em;
   line-height: 1.8;
@@ -55,7 +75,11 @@
 }
 
 /* 6. Lateef - Traditional style, good for religious texts */
-.font-lateef {
+.font-lateef .glyph,
+.font-lateef .arabic,
+.font-lateef .arabic-text,
+.font-lateef .ar,
+.font-lateef [lang="ar"] {
   font-family: 'Lateef', serif !important;
   font-size: 1.25em;
   line-height: 2;
@@ -63,7 +87,11 @@
 }
 
 /* 7. Scheherazade New - Excellent for Quranic text and harakat */
-.font-scheherazade {
+.font-scheherazade .glyph,
+.font-scheherazade .arabic,
+.font-scheherazade .arabic-text,
+.font-scheherazade .ar,
+.font-scheherazade [lang="ar"] {
   font-family: 'Scheherazade New', serif !important;
   font-size: 1.3em;
   line-height: 2.1;
@@ -71,7 +99,11 @@
 }
 
 /* 8. Mirza - Good balance between traditional and modern */
-.font-mirza {
+.font-mirza .glyph,
+.font-mirza .arabic,
+.font-mirza .arabic-text,
+.font-mirza .ar,
+.font-mirza [lang="ar"] {
   font-family: 'Mirza', serif !important;
   font-size: 1.2em;
   line-height: 1.9;
@@ -79,7 +111,11 @@
 }
 
 /* 9. Markazi Text - Compact, good for limited space */
-.font-markazi {
+.font-markazi .glyph,
+.font-markazi .arabic,
+.font-markazi .arabic-text,
+.font-markazi .ar,
+.font-markazi [lang="ar"] {
   font-family: 'Markazi Text', serif !important;
   font-size: 1.25em;
   line-height: 1.8;

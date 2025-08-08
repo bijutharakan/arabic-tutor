@@ -23,8 +23,15 @@ html, body {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: "Fredoka", system-ui, -apple-system, sans-serif;
+  font-family: "Fredoka", system-ui, -apple-system, sans-serif !important;
   line-height: 1.6;
+}
+
+/* Ensure English text always uses Fredoka */
+h1, h2, h3, h4, h5, h6,
+p, span, div, button, label, input, select, textarea,
+.tag, .controls, .hero, .card, .btn, .button {
+  font-family: "Fredoka", system-ui, -apple-system, sans-serif !important;
 }
 
 /* Arabic Text Base Styles */
