@@ -83,9 +83,12 @@ class FontSwitcher {
 
   init() {
     this.createFontSwitcher();
-    this.applyFont(this.currentFont);
     this.attachEventListeners();
     this.addKeyboardShortcuts();
+    // Apply font immediately and after a short delay to catch all elements
+    this.applyFont(this.currentFont);
+    setTimeout(() => this.applyFont(this.currentFont), 100);
+    setTimeout(() => this.applyFont(this.currentFont), 300);
   }
 
   createFontSwitcher() {
@@ -216,11 +219,13 @@ class FontSwitcher {
     // Add new font class
     document.body.classList.add(font.class);
 
-    // Apply to all Arabic text elements
+    // Apply to all Arabic text elements - INCLUDING GLYPH!
     const arabicElements = document.querySelectorAll(
-      '.arabic, .arabic-text, .ar, [lang="ar"], .letter-card, .word-arabic, ' +
-      '.phrase-arabic, .conversation-arabic, .large-arabic, .vowel-box, ' +
-      '.tutorial-arabic, .quiz-arabic, .vocabulary-arabic'
+      '.glyph, .form-glyph, .arabic, .arabic-text, .ar, [lang="ar"], ' +
+      '.letter-card .glyph, .word-arabic, .arabic-phrase, ' +
+      '.phrase-arabic, .conversation-arabic, .large-arabic, .arabic-large, ' +
+      '.vowel-box, .tutorial-arabic, .quiz-arabic, .vocabulary-arabic, ' +
+      '.letter-display, .arabic-display, .harakat-display'
     );
 
     arabicElements.forEach(element => {
@@ -343,10 +348,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (mutation.addedNodes.length) {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === 1) { // Element node
-            const arabicElements = node.querySelectorAll('.arabic, .arabic-text, [lang="ar"]');
-            if (arabicElements.length || node.classList?.contains('arabic')) {
+            // Check for all Arabic elements including glyph
+            const arabicSelectors = '.glyph, .form-glyph, .arabic, .arabic-text, .ar, [lang="ar"], .arabic-phrase';
+            const arabicElements = node.querySelectorAll(arabicSelectors);
+            
+            // Check if the node itself is an Arabic element
+            const nodeIsArabic = node.classList && (
+              node.classList.contains('glyph') ||
+              node.classList.contains('form-glyph') ||
+              node.classList.contains('arabic') ||
+              node.classList.contains('ar') ||
+              node.classList.contains('arabic-text') ||
+              node.classList.contains('arabic-phrase')
+            );
+            
+            if (arabicElements.length || nodeIsArabic) {
               const currentFont = window.fontSwitcher.getCurrentFont();
-              if (node.classList?.contains('arabic')) {
+              if (nodeIsArabic) {
                 node.classList.add(currentFont.class);
               }
               arabicElements.forEach(el => el.classList.add(currentFont.class));
@@ -405,6 +423,26 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Add font size controls after a delay
   setTimeout(addFontSizeControls, 100);
+  
+  // Re-apply font after app initialization to catch any missed elements
+  setTimeout(() => {
+    if (window.fontSwitcher) {
+      const currentFontId = window.fontSwitcher.currentFont;
+      window.fontSwitcher.applyFont(currentFontId);
+    }
+  }, 500);
+  
+  // Also re-apply when view changes (for Letters, Letter Forms, etc.)
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('[data-view]')) {
+      setTimeout(() => {
+        if (window.fontSwitcher) {
+          const currentFontId = window.fontSwitcher.currentFont;
+          window.fontSwitcher.applyFont(currentFontId);
+        }
+      }, 100);
+    }
+  });
 });
 
 // Export for use in other scripts

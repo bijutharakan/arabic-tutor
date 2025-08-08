@@ -168,8 +168,10 @@ main#app {
 
 /* Arabic Text Styles */
 .glyph, .ar, .arabic-text, .arabic-phrase, .form-glyph { 
-  font-family: "Cairo", sans-serif; 
+  /* Font family will be set by font switcher */
   font-weight: 700;
+  direction: rtl;
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
 }
 
 .glyph { 

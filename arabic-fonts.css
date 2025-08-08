@@ -87,7 +87,13 @@
 }
 
 /* Default Arabic font stack (fallback) */
-.arabic-text {
+.arabic-text,
+.glyph,
+.form-glyph,
+.ar,
+.arabic,
+.arabic-phrase,
+[lang="ar"] {
   font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', 
                'Traditional Arabic', 'Arabic Typesetting', 
                'Simplified Arabic', 'Times New Roman', serif;
@@ -98,6 +104,18 @@
   font-feature-settings: "liga" 1, "calt" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Special sizing for glyph elements */
+.glyph {
+  font-size: clamp(60px, 12vw, 90px) !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+.form-glyph {
+  font-size: 32px !important;
+  text-align: center !important;
 }
 
 /* Special classes for different text sizes */
