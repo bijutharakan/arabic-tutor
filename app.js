@@ -88,6 +88,12 @@ function pickVoice() {
 }
 
 function speakAr(text, rate = 0.85) {
+  // Use enhanced speak if available, fallback to regular
+  if (window.enhancedSpeak) {
+    window.enhancedSpeak(text, 'ar-SA', rate);
+    return;
+  }
+  
   if (!window.speechSynthesis) return;
   
   try {
