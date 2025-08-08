@@ -585,8 +585,8 @@ window.MASSIVE_VOCABULARY = MASSIVE_VOCABULARY;
 // Merge with existing WORD_CATEGORIES
 if (typeof WORD_CATEGORIES !== 'undefined') {
   MASSIVE_VOCABULARY.forEach(cat => {
-    // Check if category already exists
-    const existingCat = WORD_CATEGORIES.find(c => c.category === cat.category);
+    // Check if category already exists by key or name
+    const existingCat = WORD_CATEGORIES.find(c => c.key === cat.key || c.name === cat.name);
     if (existingCat) {
       // Merge words into existing category, avoiding duplicates
       cat.words.forEach(word => {
