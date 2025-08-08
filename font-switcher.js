@@ -136,8 +136,13 @@ class FontSwitcher {
       </div>
     `;
 
-    // Add to page
-    document.body.appendChild(switcher);
+    // Add to header instead of body
+    const header = document.querySelector('.hero-inner');
+    if (header) {
+      header.appendChild(switcher);
+    } else {
+      document.body.appendChild(switcher);
+    }
     
     // Store references
     this.switcher = switcher;
@@ -183,6 +188,7 @@ class FontSwitcher {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
         e.preventDefault();
         this.selectFont('noto-naskh');
+        this.showNotification('Font reset to Noto Naskh Arabic (Recommended)');
       }
     });
   }
@@ -380,30 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     subtree: true
   });
   
-  // Add font size controls
-  const addFontSizeControls = () => {
-    const controls = document.createElement('div');
-    controls.style.cssText = `
-      position: fixed;
-      top: 70px;
-      right: 240px;
-      z-index: 1000;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 5px;
-      display: flex;
-      gap: 5px;
-    `;
-    
-    controls.innerHTML = `
-      <button onclick="adjustFontSize(-0.1)" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 5px; cursor: pointer;">A-</button>
-      <button onclick="adjustFontSize(0.1)" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 5px; cursor: pointer;">A+</button>
-      <button onclick="resetFontSize()" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 5px; cursor: pointer;">Reset</button>
-    `;
-    
-    document.body.appendChild(controls);
-  };
+  // Add font size controls (removed - no longer needed)
   
   // Font size adjustment functions
   window.adjustFontSize = (delta) => {
@@ -421,8 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
   
-  // Add font size controls after a delay
-  setTimeout(addFontSizeControls, 100);
+  // Font size controls removed - no longer needed
   
   // Re-apply font after app initialization to catch any missed elements
   setTimeout(() => {
