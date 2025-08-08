@@ -27,6 +27,33 @@ body {
   line-height: 1.6;
 }
 
+/* Arabic Text Base Styles */
+.arabic, 
+.arabic-text,
+[lang="ar"],
+.ar {
+  direction: rtl;
+  text-align: right;
+  font-size: 1.3em;
+  line-height: 2;
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure proper letter shapes */
+.arabic-connected {
+  font-variant-ligatures: contextual;
+}
+
+/* Large Arabic Display */
+.large-arabic {
+  font-size: 2em !important;
+  line-height: 2.2 !important;
+  text-align: center;
+  margin: 20px 0;
+}
+
 /* Header Styles */
 .hero {
   background: linear-gradient(140deg, #f59e0b, #ef4444, #8b5cf6);

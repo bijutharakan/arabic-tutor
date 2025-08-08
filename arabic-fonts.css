@@ -1,0 +1,356 @@
+/* Arabic Fonts Configuration
+   Best fonts for Arabic text clarity and proper letter shapes */
+
+/* Import Google Fonts - Best Arabic Fonts Available */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lateef&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mirza:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&display=swap');
+
+/* Font Classes for Different Arabic Fonts */
+
+/* 1. Amiri - Traditional, excellent for classical texts and Quran */
+.font-amiri {
+  font-family: 'Amiri', serif !important;
+  font-size: 1.2em;
+  line-height: 2;
+  letter-spacing: 0.05em;
+}
+
+/* 2. Noto Naskh Arabic - Clear, modern, great for learning */
+.font-noto-naskh {
+  font-family: 'Noto Naskh Arabic', serif !important;
+  font-size: 1.15em;
+  line-height: 1.9;
+  letter-spacing: 0.03em;
+}
+
+/* 3. Cairo - Modern, clean, good for UI */
+.font-cairo {
+  font-family: 'Cairo', sans-serif !important;
+  font-size: 1.1em;
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+/* 4. Tajawal - Simple, clear, good readability */
+.font-tajawal {
+  font-family: 'Tajawal', sans-serif !important;
+  font-size: 1.1em;
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+/* 5. Almarai - Modern, clean lines */
+.font-almarai {
+  font-family: 'Almarai', sans-serif !important;
+  font-size: 1.1em;
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+/* 6. Lateef - Traditional style, good for religious texts */
+.font-lateef {
+  font-family: 'Lateef', serif !important;
+  font-size: 1.25em;
+  line-height: 2;
+  letter-spacing: 0.02em;
+}
+
+/* 7. Scheherazade New - Excellent for Quranic text and harakat */
+.font-scheherazade {
+  font-family: 'Scheherazade New', serif !important;
+  font-size: 1.3em;
+  line-height: 2.1;
+  letter-spacing: 0.03em;
+}
+
+/* 8. Mirza - Good balance between traditional and modern */
+.font-mirza {
+  font-family: 'Mirza', serif !important;
+  font-size: 1.2em;
+  line-height: 1.9;
+  font-weight: 500;
+}
+
+/* 9. Markazi Text - Compact, good for limited space */
+.font-markazi {
+  font-family: 'Markazi Text', serif !important;
+  font-size: 1.25em;
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+/* Default Arabic font stack (fallback) */
+.arabic-text {
+  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', 
+               'Traditional Arabic', 'Arabic Typesetting', 
+               'Simplified Arabic', 'Times New Roman', serif;
+  font-size: 1.2em;
+  line-height: 1.9;
+  direction: rtl;
+  text-align: right;
+  font-feature-settings: "liga" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Special classes for different text sizes */
+.arabic-small {
+  font-size: 1em !important;
+}
+
+.arabic-medium {
+  font-size: 1.3em !important;
+}
+
+.arabic-large {
+  font-size: 1.6em !important;
+}
+
+.arabic-xlarge {
+  font-size: 2em !important;
+}
+
+.arabic-huge {
+  font-size: 2.5em !important;
+}
+
+/* Harakat (vowels) emphasis */
+.with-harakat {
+  font-size: 1.4em !important;
+  line-height: 2.2 !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* Font Switcher Styles */
+.font-switcher {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  min-width: 200px;
+}
+
+.font-switcher-toggle {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  transition: transform 0.2s;
+}
+
+.font-switcher-toggle:hover {
+  transform: scale(1.05);
+}
+
+.font-options {
+  display: none;
+  margin-top: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.font-options.active {
+  display: block;
+}
+
+.font-option {
+  padding: 10px;
+  margin: 5px 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+}
+
+.font-option:hover {
+  border-color: #667eea;
+  background: #f7fafc;
+  transform: translateX(-2px);
+}
+
+.font-option.active {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.font-option-name {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 3px;
+}
+
+.font-option-description {
+  font-size: 12px;
+  color: #718096;
+}
+
+.font-option-preview {
+  margin-top: 8px;
+  padding: 8px;
+  background: #f7fafc;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 1.2em;
+  direction: rtl;
+}
+
+/* Letter shape improvements */
+.arabic-connected {
+  font-variant-ligatures: contextual;
+  font-feature-settings: "calt" 1, "liga" 1, "kern" 1;
+}
+
+/* Ensure proper rendering of Arabic numerals */
+.arabic-numbers {
+  font-variant-numeric: normal;
+  font-feature-settings: "numr" 0;
+}
+
+/* Mixed Arabic-English text */
+.mixed-text {
+  unicode-bidi: embed;
+  direction: ltr;
+}
+
+.mixed-text .ar {
+  direction: rtl;
+  unicode-bidi: embed;
+  display: inline-block;
+}
+
+/* Quranic text special styling */
+.quranic-text {
+  font-family: 'Scheherazade New', 'Lateef', 'Amiri', serif !important;
+  font-size: 1.5em;
+  line-height: 2.5;
+  letter-spacing: 0.05em;
+  color: #1a4d2e;
+  text-align: center;
+  direction: rtl;
+}
+
+/* Letter highlighting for learning */
+.highlight-letter {
+  background: linear-gradient(180deg, transparent 60%, #ffd700 60%);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+/* Vowel marks highlighting */
+.highlight-harakat {
+  color: #dc2626;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/* Responsive font sizes */
+@media (max-width: 768px) {
+  .arabic-text {
+    font-size: 1.1em;
+  }
+  
+  .font-switcher {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .with-harakat {
+    font-size: 1.3em !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .arabic-text {
+    font-size: 1em;
+  }
+  
+  .with-harakat {
+    font-size: 1.2em !important;
+  }
+  
+  .font-switcher {
+    right: 10px;
+    bottom: 10px;
+    min-width: 150px;
+  }
+}
+
+/* Print styles for Arabic text */
+@media print {
+  .arabic-text {
+    font-family: 'Amiri', 'Traditional Arabic', serif !important;
+    font-size: 12pt;
+    line-height: 1.8;
+  }
+  
+  .font-switcher {
+    display: none;
+  }
+}
+
+/* Animation for font switching */
+@keyframes fontSwitch {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.font-switching {
+  animation: fontSwitch 0.3s ease-in-out;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .font-switcher {
+    background: #2d3748;
+    color: white;
+  }
+  
+  .font-option {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: white;
+  }
+  
+  .font-option:hover {
+    background: #374151;
+    border-color: #667eea;
+  }
+  
+  .font-option-description {
+    color: #cbd5e0;
+  }
+  
+  .font-option-preview {
+    background: #1a202c;
+    color: white;
+  }
+}
