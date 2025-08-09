@@ -21,27 +21,26 @@ class BeginnersUI {
 
   renderBeginnersHub() {
     return `
-      <div class="beginners-hub">
-        <div class="hub-header">
-          <h2>🌟 Beginners Hub</h2>
-          <p>Start your Arabic learning journey with easy, fun lessons!</p>
-          ${this.renderProgressSummary()}
-        </div>
-
-        <div class="hub-modules">
-          ${this.renderAlphabetJourney()}
-          ${this.renderFirst100Words()}
-          ${this.renderSimpleGreetings()}
-          ${this.renderNumbersSection()}
-          ${this.renderColorsShapes()}
-          ${this.renderDailyPhrases()}
-          ${this.renderMiniGames()}
-          ${this.renderWritingPractice()}
-        </div>
-
-        <div class="achievements-panel">
-          ${this.renderAchievements()}
-        </div>
+      <div class="section">
+        <h2>🌟 Beginners Hub</h2>
+        <p style="text-align: center; color: #718096; margin-bottom: 20px;">Start your Arabic learning journey with structured, easy lessons!</p>
+      </div>
+      
+      ${this.renderProgressSummary()}
+      
+      <div class="grid">
+        ${this.renderAlphabetJourneySimple()}
+        ${this.renderFirst100WordsSimple()}
+        ${this.renderSimpleGreetingsSimple()}
+        ${this.renderNumbersSectionSimple()}
+        ${this.renderColorsShapesSimple()}
+        ${this.renderDailyPhrasesSimple()}
+        ${this.renderMiniGamesSimple()}
+        ${this.renderWritingPracticeSimple()}
+      </div>
+      
+      <div class="section">
+        ${this.renderAchievements()}
       </div>
     `;
   }
@@ -51,24 +50,26 @@ class BeginnersUI {
     const wordProgress = (this.progress.wordsLearned.length / 100) * 100;
     
     return `
-      <div class="progress-summary">
-        <div class="progress-item">
-          <span class="progress-icon">🔤</span>
-          <div class="progress-bar-container">
-            <div class="progress-bar" style="width: ${letterProgress}%"></div>
+      <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; padding: 20px; margin-bottom: 20px;">
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">🔤</span>
+            <div style="width: 120px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;">
+              <div style="height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); width: ${letterProgress}%; transition: width 0.5s ease; border-radius: 10px;"></div>
+            </div>
+            <span style="font-weight: 500;">${this.progress.lettersLearned.length}/28 Letters</span>
           </div>
-          <span class="progress-text">${this.progress.lettersLearned.length}/28 Letters</span>
-        </div>
-        <div class="progress-item">
-          <span class="progress-icon">📚</span>
-          <div class="progress-bar-container">
-            <div class="progress-bar" style="width: ${wordProgress}%"></div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">📚</span>
+            <div style="width: 120px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;">
+              <div style="height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); width: ${wordProgress}%; transition: width 0.5s ease; border-radius: 10px;"></div>
+            </div>
+            <span style="font-weight: 500;">${this.progress.wordsLearned.length}/100 Words</span>
           </div>
-          <span class="progress-text">${this.progress.wordsLearned.length}/100 Words</span>
-        </div>
-        <div class="progress-item">
-          <span class="progress-icon">🔥</span>
-          <span class="progress-text">${this.progress.streak} Day Streak</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">🔥</span>
+            <span style="font-weight: 500;">${this.progress.streak} Day Streak</span>
+          </div>
         </div>
       </div>
     `;
@@ -783,6 +784,196 @@ class BeginnersUI {
   closeAllLetters() {
     const modal = document.querySelector('.letters-modal-overlay');
     if (modal) modal.remove();
+  }
+  
+  // Simplified render methods for tab view (non-modal)
+  renderAlphabetJourneySimple() {
+    const journey = BEGINNERS_MODULE.alphabetJourney;
+    const firstThreeLetters = journey.lessons.slice(0, 3);
+    
+    return `
+      <div class="card">
+        <h3>🎯 Alphabet Journey</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Learn each letter step-by-step</p>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+          ${firstThreeLetters.map(letter => `
+            <div style="text-align: center; padding: 10px; background: ${this.progress.lettersLearned.includes(letter.id) ? '#d4edda' : '#f7fafc'}; border-radius: 10px;">
+              <div style="font-size: 36px; font-weight: bold; font-family: 'Cairo', sans-serif;">${letter.letter}</div>
+              <div style="font-size: 12px; color: #4a5568;">${letter.name}</div>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="beginners.showAllLetters()" style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer;">
+          View All Letters
+        </button>
+      </div>
+    `;
+  }
+  
+  renderFirst100WordsSimple() {
+    const module = BEGINNERS_MODULE.first100Words;
+    
+    return `
+      <div class="card">
+        <h3>💬 First 100 Words</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Essential vocabulary with pictures</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+          ${module.categories.slice(0, 4).map(cat => `
+            <button onclick="beginners.showCategoryWords('${cat.name}')" style="padding: 10px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
+              <div style="font-size: 24px;">${cat.icon}</div>
+              <div style="font-size: 12px; color: #4a5568;">${cat.name}</div>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  renderSimpleGreetingsSimple() {
+    const module = BEGINNERS_MODULE.simpleGreetings;
+    const firstTwo = module.greetings.slice(0, 2);
+    
+    return `
+      <div class="card">
+        <h3>👋 Simple Greetings</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Essential daily greetings</p>
+        ${firstTwo.map(g => `
+          <div style="padding: 10px; background: #fef3c7; border-radius: 8px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 20px; font-weight: 600; color: #92400e; font-family: 'Cairo', sans-serif;">${g.arabic}</div>
+                <div style="font-size: 14px; color: #78350f;">${g.english}</div>
+              </div>
+              <button onclick="beginners.playAudio('${g.arabic}')" style="padding: 5px 10px; background: white; border: none; border-radius: 5px; cursor: pointer;">🔊</button>
+            </div>
+          </div>
+        `).join('')}
+        <button onclick="beginners.practiceGreetings()" style="width: 100%; padding: 10px; background: #fbbf24; color: white; border: none; border-radius: 10px; cursor: pointer;">
+          Practice All
+        </button>
+      </div>
+    `;
+  }
+  
+  renderNumbersSectionSimple() {
+    const module = BEGINNERS_MODULE.numbersAndCounting;
+    const firstFive = module.numbers.slice(0, 5);
+    
+    return `
+      <div class="card">
+        <h3>🔢 Numbers & Counting</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Learn numbers 0-10</p>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 15px;">
+          ${firstFive.map(num => `
+            <div style="text-align: center; padding: 8px; background: #dbeafe; border-radius: 8px;">
+              <div style="font-size: 20px; font-weight: bold; color: #1e40af;">${num.digit}</div>
+              <div style="font-size: 12px; color: #2563eb;">${num.english}</div>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="beginners.startCountingGame()" style="width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer;">
+          Play Counting Game
+        </button>
+      </div>
+    `;
+  }
+  
+  renderColorsShapesSimple() {
+    const module = BEGINNERS_MODULE.colorsAndShapes;
+    
+    return `
+      <div class="card">
+        <h3>🎨 Colors & Shapes</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Basic colors and shapes</p>
+        <div style="margin-bottom: 10px;">
+          <div style="font-weight: 600; margin-bottom: 8px;">Colors:</div>
+          <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+            ${module.colors.slice(0, 5).map(color => `
+              <div style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; background: #f7fafc; border-radius: 5px;">
+                <span style="width: 16px; height: 16px; background: ${color.hex}; border-radius: 50%; border: 1px solid #e2e8f0;"></span>
+                <span style="font-size: 12px;">${color.arabic}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div>
+          <div style="font-weight: 600; margin-bottom: 8px;">Shapes:</div>
+          <div style="display: flex; gap: 10px;">
+            ${module.shapes.slice(0, 3).map(shape => `
+              <div style="text-align: center;">
+                <div style="font-size: 20px;">${shape.symbol}</div>
+                <div style="font-size: 12px; color: #4a5568;">${shape.arabic}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderDailyPhrasesSimple() {
+    const module = BEGINNERS_MODULE.dailyPhrases;
+    const firstCategory = module.phrases[0];
+    
+    return `
+      <div class="card">
+        <h3>🗣️ Daily Phrases</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Essential phrases for everyday use</p>
+        <div style="background: #f7fafc; padding: 10px; border-radius: 8px;">
+          <div style="font-weight: 600; margin-bottom: 8px; color: #4a5568;">${firstCategory.category}:</div>
+          ${firstCategory.items.slice(0, 3).map(phrase => `
+            <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-family: 'Cairo', sans-serif; color: #2d3748;">${phrase.arabic}</span>
+              <span style="font-size: 12px; color: #718096;">${phrase.english}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  renderMiniGamesSimple() {
+    const module = BEGINNERS_MODULE.miniGames;
+    
+    return `
+      <div class="card">
+        <h3>🎮 Learning Games</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Fun games to practice</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+          ${module.games.map(game => `
+            <button onclick="beginners.startGame('${game.name}')" style="padding: 10px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; cursor: pointer;">
+              <div style="font-size: 20px;">${game.icon}</div>
+              <div style="font-size: 11px; color: #166534;">${game.name}</div>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  renderWritingPracticeSimple() {
+    const module = BEGINNERS_MODULE.writingPractice;
+    
+    return `
+      <div class="card">
+        <h3>✍️ Writing Practice</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Learn to write Arabic letters</p>
+        <div style="margin-bottom: 15px;">
+          ${module.features.map(feature => `
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f7fafc; border-radius: 5px; margin-bottom: 5px;">
+              <span style="font-size: 20px;">${feature.icon}</span>
+              <div>
+                <div style="font-weight: 500; font-size: 12px;">${feature.name}</div>
+                <div style="font-size: 11px; color: #718096;">${feature.description}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="beginners.startWritingPractice()" style="width: 100%; padding: 10px; background: #8b5cf6; color: white; border: none; border-radius: 10px; cursor: pointer;">
+          Start Practice
+        </button>
+      </div>
+    `;
   }
 }
 
