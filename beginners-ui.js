@@ -3,6 +3,7 @@ class BeginnersUI {
   constructor() {
     this.currentLesson = 0;
     this.currentLetter = 0;
+    this.currentGreetingIndex = 0;
     this.progress = this.loadProgress() || {
       lettersLearned: [],
       wordsLearned: [],
@@ -442,6 +443,7 @@ class BeginnersUI {
     const gameHTML = `
       <div class="counting-game-modal">
         <div class="game-content">
+          <button class="close-game-btn" onclick="beginners.closeGameModal()">×</button>
           <h3>Counting Game</h3>
           <div class="game-question">
             <p>What number is this?</p>
@@ -464,6 +466,7 @@ class BeginnersUI {
   checkAnswer(selected, correct) {
     if (selected === correct) {
       this.showFeedback('Correct! 🎉', 'success');
+      setTimeout(() => this.closeGameModal(), 1500);
     } else {
       this.showFeedback('Try again! 🤔', 'error');
     }
@@ -580,16 +583,25 @@ class BeginnersUI {
   }
 
   showGameModal(html) {
+    // Remove any existing game modal first
+    this.closeGameModal();
+    
     const modal = document.createElement('div');
     modal.className = 'game-modal-overlay';
     modal.innerHTML = html;
     document.body.appendChild(modal);
     
+    // Click overlay to close
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         modal.remove();
       }
     });
+  }
+  
+  closeGameModal() {
+    const modal = document.querySelector('.game-modal-overlay');
+    if (modal) modal.remove();
   }
 
   // Additional methods for other features
@@ -597,28 +609,180 @@ class BeginnersUI {
     const category = BEGINNERS_MODULE.first100Words.categories.find(c => c.name === categoryName);
     if (!category) return;
     
-    // Implementation for showing category words
-    console.log('Showing words for category:', categoryName);
+    const wordsHTML = `
+      <div class="category-words-modal">
+        <div class="words-content">
+          <button class="close-btn" onclick="beginners.closeCategoryWords()">×</button>
+          <h3>${category.icon} ${category.name} Words</h3>
+          <div class="words-grid">
+            ${category.words.map(word => `
+              <div class="word-card-mini">
+                <div class="word-image">${word.image}</div>
+                <div class="word-arabic">${word.arabic}</div>
+                <div class="word-english">${word.english}</div>
+                <div class="word-transliteration">${word.transliteration}</div>
+                <button class="mini-audio-btn" onclick="beginners.playAudio('${word.arabic}')">🔊</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    this.showModal(wordsHTML, 'category-modal-overlay');
+  }
+  
+  closeCategoryWords() {
+    const modal = document.querySelector('.category-modal-overlay');
+    if (modal) modal.remove();
+  }
+  
+  showModal(html, className = 'modal-overlay') {
+    // Remove any existing modal
+    document.querySelectorAll('.' + className).forEach(m => m.remove());
+    
+    const modal = document.createElement('div');
+    modal.className = className;
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+    
+    // Click overlay to close
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
   }
 
   practiceGreetings() {
-    // Implementation for greeting practice
-    console.log('Starting greeting practice');
+    const greetings = BEGINNERS_MODULE.simpleGreetings.greetings;
+    const currentIndex = this.currentGreetingIndex || 0;
+    const greeting = greetings[currentIndex];
+    
+    const practiceHTML = `
+        <div class="greeting-practice-modal">
+          <div class="practice-content">
+            <button class="close-btn" onclick="beginners.closePractice()">×</button>
+            <h3>Practice Greetings (${currentIndex + 1}/${greetings.length})</h3>
+            <div class="greeting-practice-card">
+              <div class="practice-emoji">${greeting.emoji}</div>
+              <div class="practice-arabic">${greeting.arabic}</div>
+              <div class="practice-english">${greeting.english}</div>
+              <div class="practice-transliteration">${greeting.transliteration}</div>
+              <div class="practice-usage">${greeting.usage}</div>
+              ${greeting.response ? `
+                <div class="practice-response">
+                  <strong>Response:</strong> ${greeting.response}
+                  ${greeting.responseTransliteration ? `(${greeting.responseTransliteration})` : ''}
+                </div>
+              ` : ''}
+            </div>
+            <div class="practice-controls">
+              <button class="practice-audio-btn" onclick="beginners.playAudio('${greeting.arabic}')">🔊 Listen</button>
+              <button class="practice-next-btn" onclick="beginners.nextGreeting(${currentIndex})">Next →</button>
+            </div>
+          </div>
+        </div>
+      `;
+    
+    this.showModal(practiceHTML, 'practice-modal-overlay');
+  }
+  
+  nextGreeting(currentIndex) {
+    const greetings = BEGINNERS_MODULE.simpleGreetings.greetings;
+    const nextIndex = currentIndex + 1;
+    
+    if (nextIndex < greetings.length) {
+      this.closePractice();
+      setTimeout(() => {
+        this.currentGreetingIndex = nextIndex;
+        this.practiceGreetings();
+      }, 100);
+    } else {
+      this.showFeedback('Practice Complete! 🎉', 'success');
+      setTimeout(() => this.closePractice(), 2000);
+    }
+  }
+  
+  closePractice() {
+    const modal = document.querySelector('.practice-modal-overlay');
+    if (modal) modal.remove();
   }
 
   startGame(gameName) {
-    // Implementation for starting different games
-    console.log('Starting game:', gameName);
+    // Placeholder for different games
+    const gameHTML = `
+      <div class="game-placeholder-modal">
+        <div class="placeholder-content">
+          <button class="close-btn" onclick="beginners.closeGamePlaceholder()">×</button>
+          <h3>🎮 ${gameName}</h3>
+          <p>This game is coming soon!</p>
+          <p>We're working on making it fun and educational.</p>
+        </div>
+      </div>
+    `;
+    
+    this.showModal(gameHTML, 'game-placeholder-overlay');
+  }
+  
+  closeGamePlaceholder() {
+    const modal = document.querySelector('.game-placeholder-overlay');
+    if (modal) modal.remove();
   }
 
   startWritingPractice() {
-    // Implementation for writing practice
-    console.log('Starting writing practice');
+    const writingHTML = `
+      <div class="writing-practice-modal">
+        <div class="writing-content">
+          <button class="close-btn" onclick="beginners.closeWriting()">×</button>
+          <h3>✍️ Writing Practice</h3>
+          <p>Writing practice feature coming soon!</p>
+          <p>This will include:</p>
+          <ul>
+            <li>Animated stroke order guides</li>
+            <li>Interactive tracing exercises</li>
+            <li>Printable practice sheets</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    this.showModal(writingHTML, 'writing-modal-overlay');
+  }
+  
+  closeWriting() {
+    const modal = document.querySelector('.writing-modal-overlay');
+    if (modal) modal.remove();
   }
 
   showAllLetters() {
-    // Implementation for showing all letters
-    console.log('Showing all letters');
+    const letters = BEGINNERS_MODULE.alphabetJourney.lessons;
+    const lettersHTML = `
+      <div class="all-letters-modal">
+        <div class="letters-content">
+          <button class="close-btn" onclick="beginners.closeAllLetters()">×</button>
+          <h3>🔤 Complete Arabic Alphabet</h3>
+          <div class="all-letters-grid">
+            ${letters.map(letter => `
+              <div class="letter-tile ${this.progress.lettersLearned.includes(letter.id) ? 'learned' : ''}">
+                <div class="tile-letter">${letter.letter}</div>
+                <div class="tile-name">${letter.name}</div>
+                <button class="tile-learn-btn" onclick="beginners.startLetterLesson('${letter.id}')">
+                  ${this.progress.lettersLearned.includes(letter.id) ? '✓' : 'Learn'}
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    this.showModal(lettersHTML, 'letters-modal-overlay');
+  }
+  
+  closeAllLetters() {
+    const modal = document.querySelector('.letters-modal-overlay');
+    if (modal) modal.remove();
   }
 }
 
