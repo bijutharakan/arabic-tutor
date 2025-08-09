@@ -134,16 +134,14 @@ if (typeof document !== 'undefined') {
 
 // Compatibility fixes for various browsers
 (function() {
-  // Fix for Chrome on Android
-  if (/Chrome/.test(navigator.userAgent) && /Android/.test(navigator.userAgent)) {
-    const originalSpeak = window.speechSynthesis.speak;
-    window.speechSynthesis.speak = function(utterance) {
-      window.speechSynthesis.cancel();
-      setTimeout(() => {
-        originalSpeak.call(window.speechSynthesis, utterance);
-      }, 10);
-    };
-  }
+  // Universal fix to prevent audio overlap - cancel previous speech before starting new
+  const originalSpeak = window.speechSynthesis.speak;
+  window.speechSynthesis.speak = function(utterance) {
+    window.speechSynthesis.cancel();
+    setTimeout(() => {
+      originalSpeak.call(window.speechSynthesis, utterance);
+    }, 10);
+  };
   
   // Fix for Safari on iOS
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {

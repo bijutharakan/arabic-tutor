@@ -224,6 +224,168 @@ const BEGINNERS_MODULE = {
     ]
   },
 
+  vowelsHarakat: {
+    title: "Vowels (Harakat)",
+    description: "Master Arabic vowel marks and diacritics",
+    vowels: [
+      {
+        name: "Fatha",
+        arabic: "َ",
+        symbol: "ـَ",
+        sound: "a",
+        description: "Short 'a' sound like in 'cat'",
+        example: "كَتَبَ",
+        exampleMeaning: "he wrote",
+        position: "above"
+      },
+      {
+        name: "Kasra", 
+        arabic: "ِ",
+        symbol: "ـِ",
+        sound: "i",
+        description: "Short 'i' sound like in 'sit'",
+        example: "كِتَاب",
+        exampleMeaning: "book",
+        position: "below"
+      },
+      {
+        name: "Damma",
+        arabic: "ُ",
+        symbol: "ـُ",
+        sound: "u",
+        description: "Short 'u' sound like in 'put'",
+        example: "كُتُب",
+        exampleMeaning: "books",
+        position: "above"
+      },
+      {
+        name: "Sukoon",
+        arabic: "ْ",
+        symbol: "ـْ",
+        sound: "no vowel",
+        description: "Indicates no vowel sound",
+        example: "يَكْتُب",
+        exampleMeaning: "he writes",
+        position: "above"
+      },
+      {
+        name: "Shadda",
+        arabic: "ّ",
+        symbol: "ـّ",
+        sound: "double",
+        description: "Doubles the consonant",
+        example: "مُدَرِّس",
+        exampleMeaning: "teacher",
+        position: "above"
+      },
+      {
+        name: "Tanween Fatha",
+        arabic: "ً",
+        symbol: "ـً",
+        sound: "an",
+        description: "Adds 'an' sound at word end",
+        example: "كِتَابًا",
+        exampleMeaning: "a book (accusative)",
+        position: "above"
+      },
+      {
+        name: "Tanween Kasra",
+        arabic: "ٍ",
+        symbol: "ـٍ",
+        sound: "in",
+        description: "Adds 'in' sound at word end",
+        example: "كِتَابٍ",
+        exampleMeaning: "a book (genitive)",
+        position: "below"
+      },
+      {
+        name: "Tanween Damma",
+        arabic: "ٌ",
+        symbol: "ـٌ",
+        sound: "un",
+        description: "Adds 'un' sound at word end",
+        example: "كِتَابٌ",
+        exampleMeaning: "a book (nominative)",
+        position: "above"
+      }
+    ],
+    practiceWords: [
+      { word: "بَيْت", meaning: "house", vowels: "fatha + sukoon" },
+      { word: "مَدْرَسَة", meaning: "school", vowels: "fatha + sukoon + fatha + fatha" },
+      { word: "طَالِب", meaning: "student", vowels: "fatha + kasra" },
+      { word: "كُرْسِيّ", meaning: "chair", vowels: "damma + sukoon + kasra + shadda" }
+    ]
+  },
+
+  wordConstruction: {
+    title: "Word Construction",
+    description: "Learn how Arabic words are built from root letters",
+    lessons: [
+      {
+        title: "Root System",
+        description: "Most Arabic words come from 3-letter roots",
+        example: {
+          root: "ك-ت-ب",
+          rootMeaning: "related to writing",
+          derivedWords: [
+            { word: "كَتَبَ", meaning: "he wrote", pattern: "فَعَلَ" },
+            { word: "كِتَاب", meaning: "book", pattern: "فِعَال" },
+            { word: "مَكْتَب", meaning: "office/desk", pattern: "مَفْعَل" },
+            { word: "كَاتِب", meaning: "writer", pattern: "فَاعِل" },
+            { word: "مَكْتُوب", meaning: "written", pattern: "مَفْعُول" },
+            { word: "مَكْتَبَة", meaning: "library", pattern: "مَفْعَلَة" }
+          ]
+        }
+      },
+      {
+        title: "Common Patterns",
+        description: "Patterns that create different word types",
+        patterns: [
+          {
+            pattern: "فَاعِل",
+            type: "Active participle (doer)",
+            examples: [
+              { root: "د-ر-س", word: "دَارِس", meaning: "student" },
+              { root: "ع-ل-م", word: "عَالِم", meaning: "scholar" }
+            ]
+          },
+          {
+            pattern: "مَفْعُول",
+            type: "Passive participle (done to)",
+            examples: [
+              { root: "ك-ت-ب", word: "مَكْتُوب", meaning: "written" },
+              { root: "ف-ه-م", word: "مَفْهُوم", meaning: "understood" }
+            ]
+          },
+          {
+            pattern: "مَفْعَل",
+            type: "Place noun",
+            examples: [
+              { root: "ك-ت-ب", word: "مَكْتَب", meaning: "office" },
+              { root: "ل-ع-ب", word: "مَلْعَب", meaning: "playground" }
+            ]
+          }
+        ]
+      },
+      {
+        title: "Building Words Step by Step",
+        description: "How to construct words from roots",
+        steps: [
+          "1. Start with the 3-letter root (e.g., ك-ت-ب)",
+          "2. Choose a pattern (e.g., فَاعِل for 'doer')",
+          "3. Replace ف with first root letter: كَ",
+          "4. Replace ع with second root letter: اتِ",
+          "5. Replace ل with third root letter: ب",
+          "6. Result: كَاتِب (writer)"
+        ],
+        practice: [
+          { root: "د-ر-س", pattern: "فَاعِل", result: "دَارِس", meaning: "student" },
+          { root: "ط-ب-خ", pattern: "فَاعِل", result: "طَابِخ", meaning: "cook" }
+        ]
+      }
+    ]
+  },
+
   colorsAndShapes: {
     title: "Colors & Shapes",
     description: "Basic colors and shapes with visual aids",

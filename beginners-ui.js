@@ -30,6 +30,8 @@ class BeginnersUI {
       
       <div class="grid">
         ${this.renderAlphabetJourneySimple()}
+        ${this.renderVowelsHarakatSimple()}
+        ${this.renderWordConstructionSimple()}
         ${this.renderFirst100WordsSimple()}
         ${this.renderSimpleGreetingsSimple()}
         ${this.renderNumbersSectionSimple()}
@@ -494,6 +496,9 @@ class BeginnersUI {
 
   playAudio(text) {
     if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech first
+      speechSynthesis.cancel();
+      
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ar-SA';
       utterance.rate = 0.8;
@@ -786,6 +791,130 @@ class BeginnersUI {
     if (modal) modal.remove();
   }
   
+  showAllVowels() {
+    const vowels = BEGINNERS_MODULE.vowelsHarakat;
+    const vowelsHTML = `
+      <div class="vowels-modal">
+        <div class="vowels-content">
+          <button class="close-btn" onclick="beginners.closeVowels()">×</button>
+          <h3>📝 Complete Arabic Vowels (Harakat)</h3>
+          <div class="vowels-grid">
+            ${vowels.vowels.map(vowel => `
+              <div class="vowel-card">
+                <div class="vowel-symbol">بـ${vowel.arabic}</div>
+                <div class="vowel-name">${vowel.name}</div>
+                <div class="vowel-sound">Sound: "${vowel.sound}"</div>
+                <div class="vowel-description">${vowel.description}</div>
+                <div class="vowel-example">
+                  <span class="example-arabic">${vowel.example}</span>
+                  <span class="example-meaning">${vowel.exampleMeaning}</span>
+                </div>
+                <button class="vowel-audio-btn" onclick="beginners.playAudio('${vowel.example}')">🔊 Listen</button>
+              </div>
+            `).join('')}
+          </div>
+          <div class="practice-words-section">
+            <h4>Practice Words</h4>
+            <div class="practice-words-grid">
+              ${vowels.practiceWords.map(word => `
+                <div class="practice-word-item">
+                  <span class="word-arabic">${word.word}</span>
+                  <span class="word-meaning">${word.meaning}</span>
+                  <span class="word-vowels">${word.vowels}</span>
+                  <button onclick="beginners.playAudio('${word.word}')">🔊</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    this.showModal(vowelsHTML, 'vowels-modal-overlay');
+  }
+  
+  closeVowels() {
+    const modal = document.querySelector('.vowels-modal-overlay');
+    if (modal) modal.remove();
+  }
+  
+  showWordConstruction() {
+    const module = BEGINNERS_MODULE.wordConstruction;
+    const constructionHTML = `
+      <div class="construction-modal">
+        <div class="construction-content">
+          <button class="close-btn" onclick="beginners.closeConstruction()">×</button>
+          <h3>🏗️ Arabic Word Construction</h3>
+          
+          ${module.lessons.map(lesson => `
+            <div class="construction-lesson">
+              <h4>${lesson.title}</h4>
+              <p>${lesson.description}</p>
+              
+              ${lesson.example ? `
+                <div class="root-example">
+                  <div class="root-display">Root: ${lesson.example.root} (${lesson.example.rootMeaning})</div>
+                  <div class="derived-words">
+                    ${lesson.example.derivedWords.map(word => `
+                      <div class="derived-word">
+                        <span class="word-arabic">${word.word}</span>
+                        <span class="word-pattern">${word.pattern}</span>
+                        <span class="word-meaning">${word.meaning}</span>
+                        <button onclick="beginners.playAudio('${word.word}')">🔊</button>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+              
+              ${lesson.patterns ? `
+                <div class="patterns-section">
+                  ${lesson.patterns.map(pattern => `
+                    <div class="pattern-card">
+                      <div class="pattern-name">${pattern.pattern}</div>
+                      <div class="pattern-type">${pattern.type}</div>
+                      <div class="pattern-examples">
+                        ${pattern.examples.map(ex => `
+                          <div class="pattern-example">
+                            <span>${ex.root} → ${ex.word} (${ex.meaning})</span>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+              
+              ${lesson.steps ? `
+                <div class="steps-section">
+                  <h5>Steps to Build Words:</h5>
+                  <ol>
+                    ${lesson.steps.map(step => `<li>${step}</li>`).join('')}
+                  </ol>
+                  <div class="practice-examples">
+                    <h5>Practice:</h5>
+                    ${lesson.practice.map(p => `
+                      <div class="practice-item">
+                        ${p.root} + ${p.pattern} = ${p.result} (${p.meaning})
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    
+    this.showModal(constructionHTML, 'construction-modal-overlay');
+  }
+  
+  closeConstruction() {
+    const modal = document.querySelector('.construction-modal-overlay');
+    if (modal) modal.remove();
+  }
+  
   // Simplified render methods for tab view (non-modal)
   renderAlphabetJourneySimple() {
     const journey = BEGINNERS_MODULE.alphabetJourney;
@@ -805,6 +934,57 @@ class BeginnersUI {
         </div>
         <button onclick="beginners.showAllLetters()" style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer;">
           View All Letters
+        </button>
+      </div>
+    `;
+  }
+  
+  renderVowelsHarakatSimple() {
+    const module = BEGINNERS_MODULE.vowelsHarakat;
+    const firstFour = module.vowels.slice(0, 4);
+    
+    return `
+      <div class="card">
+        <h3>📝 Vowels (Harakat)</h3>
+        <p style="color: #718096; margin-bottom: 15px;">Master Arabic vowel marks</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px;">
+          ${firstFour.map(vowel => `
+            <div style="padding: 8px; background: #fef3c7; border-radius: 8px; text-align: center;">
+              <div style="font-size: 28px; font-weight: bold; font-family: 'Cairo', sans-serif;">بـ${vowel.arabic}</div>
+              <div style="font-size: 12px; font-weight: 600; color: #92400e;">${vowel.name}</div>
+              <div style="font-size: 11px; color: #78350f;">sound: ${vowel.sound}</div>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="beginners.showAllVowels()" style="width: 100%; padding: 10px; background: #f59e0b; color: white; border: none; border-radius: 10px; cursor: pointer;">
+          Learn All Vowels
+        </button>
+      </div>
+    `;
+  }
+  
+  renderWordConstructionSimple() {
+    const module = BEGINNERS_MODULE.wordConstruction;
+    const rootExample = module.lessons[0].example;
+    
+    return `
+      <div class="card">
+        <h3>🏗️ Word Construction</h3>
+        <p style="color: #718096; margin-bottom: 15px;">How Arabic words are built</p>
+        <div style="background: #e0e7ff; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+          <div style="font-weight: 600; color: #4338ca; margin-bottom: 5px;">Root: ${rootExample.root}</div>
+          <div style="font-size: 12px; color: #4c1d95; margin-bottom: 8px;">"${rootExample.rootMeaning}"</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;">
+            ${rootExample.derivedWords.slice(0, 4).map(word => `
+              <div style="background: white; padding: 5px; border-radius: 5px;">
+                <div style="font-family: 'Cairo', sans-serif; font-weight: 600; color: #1e293b;">${word.word}</div>
+                <div style="font-size: 10px; color: #64748b;">${word.meaning}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <button onclick="beginners.showWordConstruction()" style="width: 100%; padding: 10px; background: #7c3aed; color: white; border: none; border-radius: 10px; cursor: pointer;">
+          Explore Patterns
         </button>
       </div>
     `;
